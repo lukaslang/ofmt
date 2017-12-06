@@ -1,0 +1,82 @@
+OFMT - Optical Flow for Microtubule Analysis
+
+Lukas Lang (ll542@cam.ac.uk)
+Department of Applied Mathematics and Theoretical Physics, University of Cambridge, UK.
+http://www.damtp.cam.ac.uk/people/ll542/
+
+1. Introduction
+
+This is a Matlab implementation as described in:
+
+TODO: Add paper reference.
+
+If you use this software in your work you must cite the abovementioned paper in any resulting publication!
+
+BibTeX:
+
+TODO: Add BibTeX.
+
+2. License & Disclaimer
+
+Copyright 2017 Lukas Lang.
+
+This file is part of OFMT. OFMT is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+
+OFMT is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+details.
+
+You should have received a copy of the GNU General Public License along
+with OFMT.  If not, see <http://www.gnu.org/licenses/>.
+
+For the full license statement see the file COPYING.
+
+Moreover, this work incorporates source code from the colour wheel by 
+Deqing Sun, Department of Computer Science, Brown University. The license 
+statement can be found in the respective files.
+
+Furthermore, this work includes source code of the packages:
+
+Library X.
+URL:
+
+The license statements can be found in the respective folders.
+
+3. Requirements
+
+This software was originally written for and tested with Matlab R2016a.
+
+The following libraries are required for parts of this sofware:
+
+export_fig: used for producing high quality figures from the results.
+GitHub: https://github.com/altmany/export_fig
+URL: http://www.mathworks.com/matlabcentral/fileexchange/23629-exportfig
+
+4. Usage
+
+For easier use we provide a startup script (startup.m), which sets up the 
+Matlab search path. It includes required libraries and adds required 
+subdirectories. Make sure to download the required packages and to set the 
+library paths properly. Then simply run the startup script.
+
+To run the test cases execute
+
+>> runtests('test')
+
+Note that test/readlsmTest.m requires a certain LSM file to be available 
+(set via datapath.m)!
+
+In order to run the software with real data set the path to your files
+in the script:
+
+- datapath.m.
+
+The following run scripts are included:
+
+- TODO add scripts.
+
+5. Acknowledgements
