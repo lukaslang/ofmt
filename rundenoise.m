@@ -14,22 +14,18 @@
 %
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
+function rundenoise(datafolder, outputfolder)
+%RUNDENOISE Denoises an image sequence.
 %
-% This script loads an image sequence, performs L2-TV-L2 denoising, and
-% stores the output.
-clear;
-close all;
-clc;
+%   RUNANALYSIS(datafolder, outputfolder) takes a data folder name, an
+%   output folder name, runs denoising, and outputs results.
 
 % Load data.
-foldername = 'control/';
-name = '02_009/';
-folder = fullfile(datapath, foldername, name);
-folderContent = dir(fullfile(folder, '*.tif'));
+folderContent = dir(fullfile(datafolder, '*.tif'));
 
 % Load files.
 for k=1:numel(folderContent)
-    rawImage = imread(fullfile(folder, folderContent(k).name));
+    rawImage = imread(fullfile(datafolder, folderContent(k).name));
     fdelta{k} = im2double(rawImage);
 end
 
@@ -44,7 +40,7 @@ rngy = 150:256;
 % Apply selection.
 fdelta = cat(3, fdelta{frames});
 fdelta = fdelta(rngx, rngy, :);
-[n, m, t] = size(fdelta);
+[~, ~, t] = size(fdelta);
 
 % Define denoising problem.
 p = @denoise3dl2tv;
@@ -82,23 +78,19 @@ for k=2:t-1
 end
 
 % Create output folder and save results.
-outputFolder = fullfile('results', foldername, name);
-mkdir(outputFolder);
-save(fullfile(outputFolder, 'results-denoising.mat'), 'fdelta', 'f', 'fnorm', '-v7.3');
-save(fullfile(outputFolder, 'results-denoising-params.mat'), 'rngx', 'rngy', 'alpha', 'beta', 'tau', 'sigma', 'term', 'stats', '-v7.3');
+mkdir(outputfolder);
+save(fullfile(outputfolder, 'results-denoising.mat'), 'fdelta', 'f', 'fnorm', '-v7.3');
+save(fullfile(outputfolder, 'results-denoising-params.mat'), 'rngx', 'rngy', 'alpha', 'beta', 'tau', 'sigma', 'term', 'stats', '-v7.3');
 
 % Load, restrict, and output segmentation.
-seg = imread(fullfile(folder, 'images', 'segmentationMap.png'));
+seg = imread(fullfile(datafolder, 'images', 'segmentationMap.png'));
 seg = seg(rngx, rngy);
-imwrite(seg, fullfile(outputFolder, 'segmentation.png'), 'png');
-
-% Create approximate segmentation of ring.
-
+imwrite(seg, fullfile(outputfolder, 'segmentation.png'), 'png');
 
 % Crate output folder and save images.
-outputFolder = fullfile(outputFolder, 'denoising');
-mkdir(outputFolder);
+outputfolder = fullfile(outputfolder, 'denoising');
+mkdir(outputfolder);
 for k=1:t
-    imwrite(fdelta(:, :, k), fullfile(outputFolder, sprintf('input-%.3i.png', k)), 'png');
-	imwrite(f(:, :, k), fullfile(outputFolder, sprintf('image-%.3i.png', k)), 'png');
+    imwrite(fdelta(:, :, k), fullfile(outputfolder, sprintf('input-%.3i.png', k)), 'png');
+	imwrite(f(:, :, k), fullfile(outputfolder, sprintf('image-%.3i.png', k)), 'png');
 end

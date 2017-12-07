@@ -14,19 +14,15 @@
 %
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
+function runanalysis(folder)
+%RUNANALYSIS Creates plots and figures.
 %
-% This script computes analysis of vector fields and creates plots.
-clear;
-close all;
-clc;
+%   RUNANALYSIS(folder) takes a foldername, runs analysis, and outputs
+%   figures to subfolder 'analysis'.
 
 % Load data.
-foldername = 'control/';
-name = '02_009/';
-folder = fullfile('results', foldername, name);
-load(fullfile(folder, 'results-denoising.mat'));
-load(fullfile(folder, 'results-flow.mat'));
-[n, m, t] = size(f);
+load(fullfile(folder, 'results-denoising.mat'), 'f');
+load(fullfile(folder, 'results-flow.mat'), 'v1', 'v2');
 
 % Load segmentation.
 seg = im2double(imread(fullfile(folder, 'segmentation.png')));
@@ -35,7 +31,7 @@ seg = im2double(imread(fullfile(folder, 'segmentation.png')));
 seg = seg > 0;
 
 % Create output folder.
-outputFolder = fullfile('results', foldername, name, 'analysis');
+outputFolder = fullfile(folder, 'analysis');
 mkdir(outputFolder);
 
 %% Compute mean of velocities.
@@ -209,3 +205,5 @@ set(gca, 'FontName', 'Helvetica' );
 set(gca, 'FontSize', 20);
 export_fig(h, fullfile(outputFolder, 'flow-mean-outside.png'), '-png', '-q100', '-a1', '-transparent');
 close(h);
+
+end

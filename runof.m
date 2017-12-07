@@ -14,22 +14,18 @@
 %
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
+function runof(datafolder, outputfolder)
+%RUNDENOISE Denoises an image sequence.
 %
-% This script loads an image sequence, computes L2-TV-L2 optical flow, and
-% stores the output.
-clear;
-close all;
-clc;
+%   RUNANALYSIS(datafolder, outputfolder) takes a data folder name, an
+%   output folder name, runs optical flow computation, and outputs results.
 
 % Load data.
-foldername = 'control/';
-name = '02_009/';
-folder = fullfile('results', foldername, name, 'denoising');
-folderContent = dir(fullfile(folder, 'image-*.png'));
+folderContent = dir(fullfile(datafolder, 'image-*.png'));
 
 % Load files.
 for k=1:numel(folderContent)
-    rawImage = imread(fullfile(folder, folderContent(k).name));
+    rawImage = imread(fullfile(datafolder, folderContent(k).name));
     f{k} = im2double(rawImage);
 end
 f = cat(3, f{:});
@@ -76,17 +72,16 @@ for k=1:t-1
 end
 
 % Create output folder and save results.
-outputFolder = fullfile('results', foldername, name);
-mkdir(outputFolder);
-save(fullfile(outputFolder, 'results-flow.mat'), 'v1', 'v2', 'col', '-v7.3');
-save(fullfile(outputFolder, 'results-flow-params.mat'), 'alpha', 'beta', 'tau', 'sigma', 'term', 'stats', '-v7.3');
+mkdir(outputfolder);
+save(fullfile(outputfolder, 'results-flow.mat'), 'v1', 'v2', 'col', '-v7.3');
+save(fullfile(outputfolder, 'results-flow-params.mat'), 'alpha', 'beta', 'tau', 'sigma', 'term', 'stats', '-v7.3');
 
 % Create colour representation and save images.
-outputFolder = fullfile(outputFolder, 'flow');
-mkdir(outputFolder);
+outputfolder = fullfile(outputfolder, 'flow');
+mkdir(outputfolder);
 for k=1:t-1
-	imwrite(col(:, :, :, k), fullfile(outputFolder, sprintf('flow-%.3i.png', k)), 'png');
+	imwrite(col(:, :, :, k), fullfile(outputfolder, sprintf('flow-%.3i.png', k)), 'png');
 end
 
 % Save colourwheel.
-imwrite(colourWheel, fullfile(outputFolder, 'colourwheel.png'));
+imwrite(colourWheel, fullfile(outputfolder, 'colourwheel.png'));
