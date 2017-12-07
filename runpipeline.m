@@ -32,10 +32,26 @@ mkdir(resultfolder);
 fprintf('Starting analysis of folder: %s\n', datapath);
 fprintf('Outpus folder set to: %s\n', resultfolder);
 
+% Check if segmentation map is available for each dataset.
+for k=1:length(groups)
+    groupname = groups(k).name;
+    % Run through all datasets.
+    y = dir(fullfile(datapath, groupname));
+    y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
+    datasets = y([y.isdir]);
+    for l=1:length(datasets)
+        dataset = datasets(l).name;
+        datafolder = fullfile(datapath, groupname, dataset);
+
+        if(~exist(fullfile(datafolder, 'images', 'segmentationMap.png'), 'file'))
+            error('Segmentation map missing for dataset: %s\n', datafolder);
+        end
+    end
+end
+
 % Run through all groups.
 for k=1:length(groups)
     groupname = groups(k).name;
-    
     % Run through all datasets.
     y = dir(fullfile(datapath, groupname));
     y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
@@ -61,5 +77,8 @@ for k=1:length(groups)
         runanalysis(outputfolder);
     end
 end
+
+
+
 
 % TODO: Add group/combined analysis.
