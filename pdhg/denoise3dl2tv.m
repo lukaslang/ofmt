@@ -16,7 +16,7 @@
 %    along with JSME.  If not, see <http://www.gnu.org/licenses/>.
 classdef(Sealed) denoise3dl2tv < pdproblem
     %DENOISE3DL2TV Implements image denoising with L2 data term and TV
-    %regularisation term.
+    % regularisation term.
     
     properties(GetAccess = public, SetAccess = private)
         f, fb, fdelta;
@@ -28,7 +28,8 @@ classdef(Sealed) denoise3dl2tv < pdproblem
     
     methods
         function o = denoise3dl2tv(fdelta, alpha, beta)
-        %DENOISE3DL2TV Takes matrix f of size [n, m and a scalar alpha > 0.
+        %DENOISE3DL2TV Takes matrix fdelta of size [n, m, t] and scalars 
+        % alpha, beta > 0.
             o.fdelta = fdelta(:);
             o.alpha = alpha;
             o.beta = beta;

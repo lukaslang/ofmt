@@ -70,11 +70,30 @@ stats = alg.run(p);
 % Recover solution.
 f = p.solution;
 
+% Compute mean of first frame.
+frame = f(:, :, 1);
+meanf = mean(frame(:));
+
+% Normalise image sequence so that all frames have the same mean.
+fnorm = f(:, :, 1:end-1);
+for k=2:t-1
+    frame = f(:, :, k);
+	fnorm(:, :, k) = fnorm(:, :, k) * meanf / mean(frame(:));
+end
+
 % Create output folder and save results.
 outputFolder = fullfile('results', foldername, name);
 mkdir(outputFolder);
-save(fullfile(outputFolder, 'results-denoising.mat'), 'fdelta', 'f', '-v7.3');
-save(fullfile(outputFolder, 'results-denoising-params.mat'), 'alpha', 'beta', 'tau', 'sigma', 'term', 'stats', '-v7.3');
+save(fullfile(outputFolder, 'results-denoising.mat'), 'fdelta', 'f', 'fnorm', '-v7.3');
+save(fullfile(outputFolder, 'results-denoising-params.mat'), 'rngx', 'rngy', 'alpha', 'beta', 'tau', 'sigma', 'term', 'stats', '-v7.3');
+
+% Load, restrict, and output segmentation.
+seg = imread(fullfile(folder, 'images', 'segmentationMap.png'));
+seg = seg(rngx, rngy);
+imwrite(seg, fullfile(outputFolder, 'segmentation.png'), 'png');
+
+% Create approximate segmentation of ring.
+
 
 % Crate output folder and save images.
 outputFolder = fullfile(outputFolder, 'denoising');
