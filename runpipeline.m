@@ -20,6 +20,9 @@ clear;
 close all;
 clc;
 
+% Flag to recompute all results.
+recompute = false;
+
 % Add all subfolders.
 y = dir(datapath);
 y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
@@ -44,7 +47,7 @@ for k=1:length(groups)
         datafolder = fullfile(datapath, groupname, dataset);
 
         if(~exist(fullfile(datafolder, 'images', 'segmentationMap.png'), 'file'))
-            error('Segmentation map missing for dataset: %s\n', datafolder);
+            warning('Segmentation map missing for dataset: %s\n', datafolder);
         end
     end
 end
@@ -64,21 +67,20 @@ for k=1:length(groups)
         fprintf('Dataset: %s\n', fullfile(groupname, dataset));
         
         % Run denoising if results don't exist.
-        if(~exist(fullfile(outputfolder, 'results-denoising.mat'), 'file'))
+        if(recompute || ~exist(fullfile(outputfolder, 'results-denoising.mat'), 'file'))
             rundenoise(datafolder, outputfolder);
         end
         
         % Run optical flow computation if results don't exist.
-        if(~exist(fullfile(outputfolder, 'results-flow.mat'), 'file'))
+        if(recompute || ~exist(fullfile(outputfolder, 'results-flow.mat'), 'file'))
             runof(fullfile(outputfolder, 'denoising'), outputfolder);
         end
         
         % Run analysis.
-        runanalysis(outputfolder);
+        if(recompute || ~exist(fullfile(outputfolder, 'analysis'), 'dir'))
+            runanalysis(outputfolder);
+        end
     end
 end
-
-
-
 
 % TODO: Add group/combined analysis.
