@@ -30,12 +30,14 @@ for k=1:numel(folderContent)
 end
 
 % Restrict frames.
-frames = 1:5;
+frames = 1:10;
 %frames = 1:length(f);
 
 % Restrict image.
-rngx = 200:370;
-rngy = 150:256;
+%rngx = 200:370;
+%rngy = 150:256;
+rngx = 1:size(fdelta{1}, 1);
+rngy = 1:size(fdelta{1}, 2);
 
 % Apply selection.
 fdelta = cat(3, fdelta{frames});

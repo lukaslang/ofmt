@@ -33,7 +33,7 @@ resultfolder = 'results';
 mkdir(resultfolder);
 
 fprintf('Starting analysis of folder: %s\n', datapath);
-fprintf('Outpus folder set to: %s\n', resultfolder);
+fprintf('Output folder set to: %s\n', resultfolder);
 
 % Check if segmentation map is available for each dataset.
 checkSegmentationMap(groups);
