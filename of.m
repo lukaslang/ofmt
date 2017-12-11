@@ -49,7 +49,7 @@ alg = pdhg(tau, sigma, term, 100, @logenergy);
 
 % Compute partial derivatives.
 fvec = f(:);
-[Dx, Dy, ~] = vecderiv3c(m, n, t-1, 1, 1, 1);
+[Dx, Dy, ~] = vecderiv3dc(m, n, t-1, 1, 1, 1);
 fx = reshape(Dx * fvec(1:n*m*(t-1)), n, m, t-1);
 fy = reshape(Dy * fvec(1:n*m*(t-1)), n, m, t-1);
 [~, ~, Dt] = vecderiv3dfw(m, n, t, 1, 1, 1);
