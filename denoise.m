@@ -31,7 +31,7 @@ end
 
 % Restrict frames.
 %frames = 1:10;
-frames = 1:length(f);
+frames = 1:length(fdelta);
 
 % Restrict image.
 %rngx = 200:370;
