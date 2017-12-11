@@ -217,7 +217,7 @@ classdef jointModelLargeScale < handle
             %% create flexBox object for u
             obj.mainU = flexBox;
 
-            obj.mainU.params.showPrimals = 100;
+            %obj.mainU.params.showPrimals = 100;
             obj.mainU.params.tol = 1e-6;
             obj.mainU.params.verbose = obj.verbose;
             obj.mainU.params.tryCPP = 1;

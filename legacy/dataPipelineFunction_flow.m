@@ -33,7 +33,7 @@ function result = dataPipelineFunction_flow(folder)
     end
 
     %%
-    verbose = 0; %can be 0,1 or 2
+    verbose = 1; %can be 0,1 or 2
     alpha = 0.005; %regularizer u
     beta = 0.01; % regularizer v
     gamma = 0.1; % optical flow weight
