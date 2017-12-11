@@ -11,7 +11,7 @@
 
 clear all;close all;clc;
 %%
-%addpath(genpath(cd))
+addpath(genpath(cd))
 
 %folder name
 %mainFolder = [datapath, '01_control'];
