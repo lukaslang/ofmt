@@ -62,12 +62,8 @@ classdef(Sealed) vecof3dl2tv < pdproblem
         end
         
         function updatePrimal(o, tau)
-            % Update primal variables.
-            k1 = o.Dx' * o.y(:, 1) + o.Dy' * o.y(:, 2) + o.Dt' * o.y(:, 3);
-            k2 = o.Dx' * o.y(:, 4) + o.Dy' * o.y(:, 5) + o.Dt' * o.y(:, 6);
-            
-            % Apply adjoint of K to dual variables.
-            x = o.v - tau * [k1, k2];
+            % Apply adjoint of K to dual variables and update primal.
+            x = o.v - tau * o.applyAdjoint(o.y);
             
             % Compute proximal mapping.
             b1 = x(:, 1) / tau - o.fx .* o.ft;
@@ -87,12 +83,7 @@ classdef(Sealed) vecof3dl2tv < pdproblem
         
         function updateDual(o, sigma)
             % Apply K to primal variables.
-            o.y(:, 1) = o.y(:, 1) + sigma * o.Dx * o.v(:, 1);
-            o.y(:, 2) = o.y(:, 2) + sigma * o.Dy * o.v(:, 1);
-            o.y(:, 3) = o.y(:, 3) + sigma * o.Dt * o.v(:, 1);
-            o.y(:, 4) = o.y(:, 4) + sigma * o.Dx * o.v(:, 2);
-            o.y(:, 5) = o.y(:, 5) + sigma * o.Dy * o.v(:, 2);
-            o.y(:, 6) = o.y(:, 6) + sigma * o.Dt * o.v(:, 2);
+            o.y = o.y + sigma * o.applyOperator(o.v);
 
             len = sqrt(sum((o.y(:, [1, 2, 4, 5]) / o.alpha).^2, 2));
             o.y(:, 1) = o.y(:, 1) ./ max(1, len);
@@ -102,6 +93,28 @@ classdef(Sealed) vecof3dl2tv < pdproblem
             
             o.y(:, 3) = o.beta * o.y(:, 3) ./ (o.beta + sigma);
             o.y(:, 6) = o.beta * o.y(:, 6) ./ (o.beta + sigma);
+        end
+        
+        function x = primal(o)
+            x = o.v;
+        end
+        
+        function y = dual(o)
+            y = o.y;
+        end
+        
+        function y = applyOperator(o, x)
+            y(:, 1) = o.Dx * x(:, 1);
+            y(:, 2) = o.Dy * x(:, 1);
+            y(:, 3) = o.Dt * x(:, 1);
+            y(:, 4) = o.Dx * x(:, 2);
+            y(:, 5) = o.Dy * x(:, 2);
+            y(:, 6) = o.Dt * x(:, 2);
+        end
+        
+        function x = applyAdjoint(o, y)
+            x(:, 1) = o.Dx' * y(:, 1) + o.Dy' * y(:, 2) + o.Dt' * y(:, 3);
+            x(:, 2) = o.Dx' * y(:, 4) + o.Dy' * y(:, 5) + o.Dt' * y(:, 6);
         end
         
         function [v1, v2] = solution(o)

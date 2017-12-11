@@ -14,16 +14,21 @@
 %
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
-function logenergy(iter, p, pprev, tau, sigma)
-%LOGENERGY Plots the energy of the current iterate.
+function pdres = pdresidual(p, pprev, tau, sigma)
+%PDRESIDUAL Returns the primal-dual residual.
 %
-%   LOGENERGY(iter, p, pprev) takes the current iteration iter and two 
-%   instances of type pdproblem and logs the current energy.
+%   PDRESIDUAL(p, pprev, tau, sigma) takes two instances of type pdproblem,
+%   parameters tau and sigma, and returns the primal-dual residual.
 %
-%   iter is a positive integer.
-%   p, pprev are of type pdproblem.
+%   p, ppref are of type pdproblem.
+%   tau, sigma > 0 are scalars.
+%
+%   See Goldstein, Esser, and Baraniuk. Adaptive primal-dual hybrid
+%   gradient methods for saddle-point problems, arXiv preprint 
+%   arXiv:1305.0546, 2013.
 
-% Log current iteration and energy.
-fprintf('Iter=%i, E(x)=%g, pdres=%g.\n', iter, p.eval(), pdresidual(p, pprev, tau, sigma));
+pres = (pprev.primal - p.primal)/tau - p.applyAdjoint(pprev.dual - p.dual);
+dres = (pprev.dual - p.dual)/sigma - p.applyOperator(pprev.primal - p.primal);
+pdres = (sum(abs((pres(:)))) + sum(abs((dres(:))))) / numel(p.primal);
 
 end

@@ -42,6 +42,22 @@ classdef(Sealed) iszeroproblem < pdproblem
             % Does nothing.
         end
         
+        function x = primal(~)
+            x = o.x;
+        end
+        
+        function x = dual(~)
+            x = o.x;
+        end
+        
+        function x = applyOperator(~, ~)
+            x = o.x;
+        end
+        
+        function x = applyAdjoint(~, ~)
+            x = o.x;
+        end
+        
         function v = solution(obj)
             v = obj.x;
         end

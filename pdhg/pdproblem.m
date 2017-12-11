@@ -14,7 +14,7 @@
 %
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
-classdef pdproblem < handle
+classdef pdproblem < matlab.mixin.Copyable
     %PDPROBLEM An abstract problem class.
     %   Provides a type for an abstract primal-dual saddle point problem
     %   of the form
@@ -32,6 +32,18 @@ classdef pdproblem < handle
         
         updateDual(obj, sigma);
         % UPDATEDUAL Performs update step to dual variables.
+        
+        x = primal(obj);
+        % PRIMAL Returns the primal variable(s).
+        
+        y = dual(obj);
+        % DUAL Returns the dual variable(s).
+        
+        y = applyOperator(obj, x);
+        % Applies K to x. 
+        
+        x = applyAdjoint(obj, y);
+        % Applies adjoint of K to y. 
         
         v = solution(obj);
         % SOLUTION Returns the current solution in the expected dimensions.

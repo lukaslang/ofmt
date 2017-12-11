@@ -57,21 +57,36 @@ classdef(Sealed) denoise3dl2tv < pdproblem
         function updatePrimal(o, tau)
             fold = o.f;
             % Apply adjoint of K to dual variables.
-            k = o.Dx' * o.y(:, 1) + o.Dy' * o.y(:, 2) + o.Dt' * o.y(:, 3);
+            k = o.applyAdjoint(o.y);
             o.f = (o.f - tau * (k - o.fdelta)) / (1 + tau);
             o.fb = 2 * o.f - fold;
         end
         
         function updateDual(o, sigma)
             % Apply K to primal variables.
-            o.y(:, 1) = o.y(:, 1) + sigma * o.Dx * o.fb;
-            o.y(:, 2) = o.y(:, 2) + sigma * o.Dy * o.fb;
+            o.y = o.y + sigma * o.applyOperator(o.fb);
             len = sqrt((o.y(:, 1)/o.alpha).^2 + (o.y(:, 2)/o.alpha).^2);
             o.y(:, 1) = o.y(:, 1) ./ max(1, len);
             o.y(:, 2) = o.y(:, 2) ./ max(1, len);
-            
-            o.y(:, 3) = o.y(:, 3) + sigma * o.Dt * o.fb;
             o.y(:, 3) = o.beta * o.y(:, 3) ./ (o.beta + sigma);
+        end
+        
+        function x = primal(o)
+            x = o.f;
+        end
+        
+        function y = dual(o)
+            y = o.y;
+        end
+        
+        function y = applyOperator(o, x)
+            y(:, 1) = o.Dx * x;
+            y(:, 2) = o.Dy * x;
+            y(:, 3) = o.Dt * x;
+        end
+        
+        function x = applyAdjoint(o, y)
+            x = o.Dx' * y(:, 1) + o.Dy' * y(:, 2) + o.Dt' * y(:, 3);
         end
         
         function v = solution(o)

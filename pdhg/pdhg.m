@@ -47,7 +47,11 @@ classdef(Sealed) pdhg
         %   p is of type pdproblem.
             tic;
             iter = 1;
-            while(~o.term(iter, p))
+            pprev = p.copy;
+            while(~o.term(iter, p, pprev, o.tau, o.sigma))
+                % Save previous iterate.
+                pprev = p.copy;
+                
                 % Update primal variables.
                 p.updatePrimal(o.tau);
 
@@ -56,7 +60,7 @@ classdef(Sealed) pdhg
 
                 if(mod(iter, o.logeval) == 0)
                     % Call log function.
-                    o.loghandle(iter, p);
+                    o.loghandle(iter, p, pprev, o.tau, o.sigma);
                 end
                 
                 % Increase iteration count.
