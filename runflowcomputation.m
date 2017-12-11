@@ -34,6 +34,7 @@ mkdir(resultfolder);
 
 fprintf('Starting analysis of folder: %s\n', datapath);
 fprintf('Output folder set to: %s\n', resultfolder);
+fprintf('Found %i groups.\n', length(groups));
 
 % Run through all groups.
 for k=1:length(groups)
