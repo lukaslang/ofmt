@@ -23,14 +23,13 @@ clc;
 % Flag to recompute all results.
 recompute = false;
 
+% Set folder with results.
+resultfolder = 'results-testdata';
+
 % Add all subfolders.
-y = dir(datapath);
+y = dir(resultfolder);
 y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
 groups = y([y.isdir]);
-
-% Define and create folder with results.
-resultfolder = 'results';
-mkdir(resultfolder);
 
 fprintf('Starting analysis of folder: %s\n', datapath);
 fprintf('Output folder set to: %s\n', resultfolder);
@@ -43,12 +42,11 @@ checkSegmentationMap(groups);
 for k=1:length(groups)
     groupname = groups(k).name;
     % Run through all datasets.
-    y = dir(fullfile(datapath, groupname));
+    y = dir(fullfile(resultfolder, groupname));
     y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
     datasets = y([y.isdir]);
     for l=1:length(datasets)
         dataset = datasets(l).name;
-        datafolder = fullfile(datapath, groupname, dataset);
         outputfolder = fullfile(resultfolder, groupname, dataset);
         
         fprintf('Dataset: %s\n', fullfile(groupname, dataset));

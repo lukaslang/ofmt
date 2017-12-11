@@ -104,7 +104,7 @@ close(h);
 % Convert velocities polar coordinates.
 [theta, rho] = cart2pol(v1 .* ~seg, -v2 .* ~seg);
 
-% Scatter plot for velocities within segmentation.
+% Scatter plot for velocities outside segmentation.
 h = figure(1);
 polarscatter(theta(:), rho(:), 10, '.');
 title('Velocities outside segmentation.', 'Interpreter', 'latex');
@@ -116,7 +116,7 @@ close(h);
 % Find vectors where length is larger than epsilon.
 idx = rho >= 1e-5;
 
-% Polar histogram for velocities within segmentation.
+% Polar histogram for velocities outside segmentation.
 h = figure(1);
 polarhistogram(theta(idx), 50, 'Normalization', 'probability');
 title('Histogram of velocities outside segmentation.', 'Interpreter', 'latex');
@@ -200,7 +200,7 @@ close(h);
 h = figure(1);
 imagesc(computeColour(meanv1 .* ~seg, -meanv2 .* ~seg));
 axis image;
-title('Mean velocity inside segmentation.', 'Interpreter', 'latex');
+title('Mean velocity outside segmentation.', 'Interpreter', 'latex');
 set(gca, 'FontName', 'Helvetica' );
 set(gca, 'FontSize', 20);
 export_fig(h, fullfile(outputFolder, 'flow-mean-outside.png'), '-png', '-q100', '-a1', '-transparent');
