@@ -24,7 +24,7 @@ clc;
 recompute = false;
 
 % Set folder with results.
-resultfolder = 'results-testdata';
+resultfolder = 'results';
 
 % Add all subfolders.
 y = dir(resultfolder);
