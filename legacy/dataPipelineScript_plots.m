@@ -11,11 +11,11 @@
 
 clear all;close all;clc;
 %%
-addpath(genpath(cd))
+%addpath(genpath(cd))
 
 %folder name
-%mainFolder = [datapath, '01_control'];
-mainFolder = 'data';
+mainFolder = [datapath, '01_control'];
+%mainFolder = 'data';
 
 % Add all subfolders.
 y = dir(mainFolder);
