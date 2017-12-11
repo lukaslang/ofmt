@@ -30,8 +30,8 @@ for k=1:numel(folderContent)
 end
 
 % Restrict frames.
-frames = 1:10;
-%frames = 1:length(f);
+%frames = 1:10;
+frames = 1:length(f);
 
 % Restrict image.
 %rngx = 200:370;
