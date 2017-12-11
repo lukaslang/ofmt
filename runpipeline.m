@@ -15,7 +15,7 @@
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
 %
-% This script runs the denoising, optical flow, and analysis pipeline.
+% This script runs denoising and optical flow for each dataset.
 clear;
 close all;
 clc;
@@ -35,9 +35,6 @@ mkdir(resultfolder);
 fprintf('Starting analysis of folder: %s\n', datapath);
 fprintf('Output folder set to: %s\n', resultfolder);
 
-% Check if segmentation map is available for each dataset.
-checkSegmentationMap(groups);
-
 % Run through all groups.
 for k=1:length(groups)
     groupname = groups(k).name;
@@ -54,39 +51,17 @@ for k=1:length(groups)
         
         % Run denoising if results don't exist.
         if(recompute || ~exist(fullfile(outputfolder, 'results-denoising.mat'), 'file'))
-            rundenoise(datafolder, outputfolder);
+            denoise(datafolder, outputfolder);
         end
         
         % Run optical flow computation if results don't exist.
         if(recompute || ~exist(fullfile(outputfolder, 'results-flow.mat'), 'file'))
-            runof(fullfile(outputfolder, 'denoising'), outputfolder);
+            of(fullfile(outputfolder, 'denoising'), outputfolder);
         end
         
-        % Run analysis.
-        if(recompute || ~exist(fullfile(outputfolder, 'analysis'), 'dir'))
-            runanalysis(outputfolder);
-        end
-    end
-end
-
-% TODO: Add group/combined analysis
-
-
-function checkSegmentationMap(groups)
-% CHECKSEGMENTATIONMAP Runs a quick check if for every dataset a
-% segmentation exists. Fails with error.
-	for k=1:length(groups)
-        groupname = groups(k).name;
-        % Run through all datasets.
-        y = dir(fullfile(datapath, groupname));
-        y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
-        datasets = y([y.isdir]);
-        for l=1:length(datasets)
-            dataset = datasets(l).name;
-            datafolder = fullfile(datapath, groupname, dataset);
-            if(~exist(fullfile(datafolder, 'images', 'segmentationMap.png'), 'file'))
-                error('Segmentation map missing for dataset: %s\n', datafolder);
-            end
-        end
+        % Run optical flow computation if results don't exist.
+        %if(recompute || ~exist(fullfile(outputfolder, 'results-flexbox-flow.mat'), 'file'))
+            %offlexbox(fullfile(outputfolder, 'denoising'), outputfolder);
+        %end
     end
 end

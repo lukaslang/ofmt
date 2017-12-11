@@ -14,196 +14,69 @@
 %
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
-function runanalysis(folder)
-%RUNANALYSIS Creates plots and figures.
 %
-%   RUNANALYSIS(folder) takes a foldername, runs analysis, and outputs
-%   figures to subfolder 'analysis'.
+% This script runs analysis and creates plots.
+clear;
+close all;
+clc;
 
-% Load data.
-load(fullfile(folder, 'results-denoising.mat'), 'f');
-load(fullfile(folder, 'results-flow.mat'), 'v1', 'v2');
+% Flag to recompute all results.
+recompute = false;
 
-% Load segmentation.
-seg = im2double(imread(fullfile(folder, 'segmentation.png')));
+% Add all subfolders.
+y = dir(datapath);
+y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
+groups = y([y.isdir]);
 
-% Set segmentation to be one inside and zero outside.
-seg = seg > 0;
+% Define and create folder with results.
+resultfolder = 'results';
+mkdir(resultfolder);
 
-% Create output folder.
-outputFolder = fullfile(folder, 'analysis');
-mkdir(outputFolder);
+fprintf('Starting analysis of folder: %s\n', datapath);
+fprintf('Output folder set to: %s\n', resultfolder);
 
-%% Compute mean of velocities.
+% Check if segmentation map is available for each dataset.
+checkSegmentationMap(groups);
 
-% Compute means of velocities over time.
-meancol = computeColour(mean(v1, 3), mean(v2, 3));
+% Run through all groups.
+for k=1:length(groups)
+    groupname = groups(k).name;
+    % Run through all datasets.
+    y = dir(fullfile(datapath, groupname));
+    y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
+    datasets = y([y.isdir]);
+    for l=1:length(datasets)
+        dataset = datasets(l).name;
+        datafolder = fullfile(datapath, groupname, dataset);
+        outputfolder = fullfile(resultfolder, groupname, dataset);
+        
+        fprintf('Dataset: %s\n', fullfile(groupname, dataset));
 
-% Plot mean velocity.
-h = figure(1);
-imagesc(meancol);
-axis image;
-title('Mean velocity.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-all-mean.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
+        % Run analysis.
+        if(recompute || ~exist(fullfile(outputfolder, 'analysis'), 'dir'))
+            createplots(outputfolder);
+        end
+    end
+end
 
-% Compute variances of velocities over time.
-varv1 = var(v1, 0, 3);
-varv2 = var(v2, 0, 3);
-
-% Plot mean velocity.
-h = figure(1);
-imagesc(varv1);
-axis image;
-colorbar;
-title('Variance $v_{1}$.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-all-variance-v1.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
-h = figure(1);
-imagesc(varv2);
-axis image;
-colorbar;
-title('Variance $v_{2}$.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-all-variance-v2.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
-
-%% Visualise velocities within segmentation.
-
-% Convert velocities polar coordinates.
-[theta, rho] = cart2pol(v1 .* seg, -v2 .* seg);
-
-% Scatter plot for velocities within segmentation.
-h = figure(1);
-polarscatter(theta(:), rho(:), 10, '.');
-title('Velocities inside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-all-scatter-inside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
-
-% Find vectors where length is larger than epsilon.
-idx = rho >= 1e-5;
-
-% Polar histogram for velocities within segmentation.
-h = figure(1);
-polarhistogram(theta(idx), 50, 'Normalization', 'probability');
-title('Histogram of velocities inside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-all-histogram-inside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
-
-%% Visualise velocities outside segmentation.
-
-% Convert velocities polar coordinates.
-[theta, rho] = cart2pol(v1 .* ~seg, -v2 .* ~seg);
-
-% Scatter plot for velocities within segmentation.
-h = figure(1);
-polarscatter(theta(:), rho(:), 10, '.');
-title('Velocities outside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-all-scatter-outside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
-
-% Find vectors where length is larger than epsilon.
-idx = rho >= 1e-5;
-
-% Polar histogram for velocities within segmentation.
-h = figure(1);
-polarhistogram(theta(idx), 50, 'Normalization', 'probability');
-title('Histogram of velocities outside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-all-histogram-outside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
+% TODO: Add group/combined analysis
 
 
-%% Visualise mean of velocities within segmentation. 
-
-% Compute average velocities.
-meanv1 = mean(v1, 3);
-meanv2 = mean(v2, 3);
-
-% Convert to polar coordinates.
-[theta, rho] = cart2pol(meanv1 .* seg, -meanv2 .* seg);
-
-% Scatter plot.
-h = figure(1);
-polarscatter(theta(:), rho(:), 10, '.');
-title('Mean velocities inside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-mean-scatter-inside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
-
-% Find vectors where length is larger than epsilon.
-idx = rho >= 1e-5;
-
-% Histogram plot.
-h = figure(1);
-polarhistogram(theta(idx), 50, 'Normalization', 'probability');
-title('Mean velocities inside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-mean-histogram-inside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
-
-% Plot mean velocity.
-h = figure(1);
-imagesc(computeColour(meanv1 .* seg, -meanv2 .* seg));
-axis image;
-title('Mean velocity inside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-mean-inside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
-
-%% Visualise mean of velocities outside segmentation.
-
-% Compute average velocities.
-meanv1 = mean(v1, 3);
-meanv2 = mean(v2, 3);
-
-% Convert to polar coordinates.
-[theta, rho] = cart2pol(meanv1 .* ~seg, -meanv2 .* ~seg);
-
-% Scatter plot.
-h = figure(1);
-polarscatter(theta(:), rho(:), 10, '.');
-title('Mean velocities outside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-mean-scatter-outside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
-
-% Find vectors where length is larger than epsilon.
-idx = rho >= 1e-5;
-
-% Histogram plot.
-h = figure(1);
-polarhistogram(theta(idx), 50, 'Normalization', 'probability');
-title('Mean velocities outside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-mean-histogram-outside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
-
-% Plot mean velocity.
-h = figure(1);
-imagesc(computeColour(meanv1 .* ~seg, -meanv2 .* ~seg));
-axis image;
-title('Mean velocity inside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-mean-outside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
-
+function checkSegmentationMap(groups)
+% CHECKSEGMENTATIONMAP Runs a quick check if for every dataset a
+% segmentation exists. Fails with error.
+	for k=1:length(groups)
+        groupname = groups(k).name;
+        % Run through all datasets.
+        y = dir(fullfile(datapath, groupname));
+        y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
+        datasets = y([y.isdir]);
+        for l=1:length(datasets)
+            dataset = datasets(l).name;
+            datafolder = fullfile(datapath, groupname, dataset);
+            if(~exist(fullfile(datafolder, 'images', 'segmentationMap.png'), 'file'))
+                error('Segmentation map missing for dataset: %s\n', datafolder);
+            end
+        end
+    end
 end

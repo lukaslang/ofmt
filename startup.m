@@ -23,10 +23,16 @@ libraryPath = '../';
 % Export Figure is required for saving figures.
 addpath(genpath(fullfile(libraryPath, 'export_fig')));
 
+% FlexBox is required for denoising and optical flow computation.
+%addpath(genpath(fullfile(libraryPath, 'flexBox')));
+
+% motionEstimationGUI is used for optical flow computation.
+%addpath(genpath(fullfile(libraryPath, 'motionEstimationGUI')));
+
 % Add all subfolders.
 y = dir('.');
 y = y([y.isdir]);
-y = y(~cellfun(@(x) strcmp(x, '.git') || strcmp(x, '.') || strcmp(x, '..') || strcmp(x, 'results'), {y.name}));
+y = y(~cellfun(@(x) strcmp(x, '.git') || strcmp(x, '.') || strcmp(x, '..') || strcmp(x, 'results') || strcmp(x, 'data'), {y.name}));
 % Add to path.
 cellfun(@(x) addpath(genpath(fullfile(pwd, x))), {y.name});
 

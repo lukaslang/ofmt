@@ -14,10 +14,10 @@
 %
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
-function rundenoise(datafolder, outputfolder)
-%RUNDENOISE Denoises an image sequence.
+function denoise(datafolder, outputfolder)
+%DENOISE Denoises an image sequence.
 %
-%   RUNANALYSIS(datafolder, outputfolder) takes a data folder name, an
+%   DENOISE(datafolder, outputfolder) takes a data folder name, an
 %   output folder name, runs denoising, and outputs results.
 
 % Load data.
