@@ -29,13 +29,10 @@ for k=1:numel(folderContent)
     fdelta{k} = im2double(rawImage);
 end
 
-% Restrict frames.
-%frames = 1:10;
+% Select frames.
 frames = 1:length(fdelta);
 
-% Restrict image.
-%rngx = 200:370;
-%rngy = 150:256;
+% Select image section.
 rngx = 1:size(fdelta{1}, 1);
 rngy = 1:size(fdelta{1}, 2);
 
