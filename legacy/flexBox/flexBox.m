@@ -35,7 +35,7 @@ classdef flexBox < handle
             obj.params.showPrimals = 0;
 
             obj.params.tryCPP = 0;
-            obj.params.relativePathToMEX = 'flexBox_CPP/source/build/bin';
+            obj.params.relativePathToMEX = 'flexBox_CPP/source/bin';
 
             obj.primals = {};
             obj.duals = {};
