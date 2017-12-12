@@ -20,24 +20,29 @@ classdef(Sealed) pdhg
     
     properties(GetAccess = public, SetAccess = private)
         tau, sigma;
-        term;
+        termeval;
+        termhandle;
         logeval;
         loghandle;
     end
     
     methods
-        function o = pdhg(tau, sigma, term, logeval, loghandle)
+        function o = pdhg(tau, sigma, termeval, termhandle, logeval, loghandle)
         % PDHG Takes parameters tau, sigma, and options.
         %   tau and sigma are scalars > 0.
-        %   term a function handle implementing a termination criterion
+        %   termeval an integer specifying the check for termination.
+        %   termhandle a function handle implementing a termination criterion.
         %   logeval an integer specifying the logging interval in iterations.
         %   loghandle a function handle called every logeval iterations.
         %
-        %   Both term and loghandle are functions of the form x(iter, p),
-        %   where iter is the current iteration and p is of type pdproblem.
+        %   Both termhandle and loghandle are functions of the form
+        %   x(iter, p, pprev, tau, sigma), where iter is the current 
+        %   iteration, p and pprev are of type pdproblem, and tau, sigma
+        %   are parameters.
             o.tau = tau;
             o.sigma = sigma;
-            o.term = term;
+            o.termeval = termeval;
+            o.termhandle = termhandle;
             o.logeval = logeval;
             o.loghandle = loghandle;
         end
@@ -47,8 +52,8 @@ classdef(Sealed) pdhg
         %   p is of type pdproblem.
             tic;
             iter = 1;
-            pprev = p.copy;
-            while(~o.term(iter, p, pprev, o.tau, o.sigma))
+            term = false;
+            while(~term)
                 % Save previous iterate.
                 pprev = p.copy;
                 
@@ -58,9 +63,14 @@ classdef(Sealed) pdhg
                 % Update dual variables.
                 p.updateDual(o.sigma);
 
+                % Call log function.
                 if(mod(iter, o.logeval) == 0)
-                    % Call log function.
                     o.loghandle(iter, p, pprev, o.tau, o.sigma);
+                end
+                
+                % Call term function.
+                if(mod(iter, o.termeval) == 0)
+                    term = o.termhandle(iter, p, pprev, o.tau, o.sigma);
                 end
                 
                 % Increase iteration count.

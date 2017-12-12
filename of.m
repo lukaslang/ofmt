@@ -43,10 +43,10 @@ tau = 1/sqrt(8);
 sigma = 1/sqrt(8);
 
 % Define termination criterion.
-term = @(iter, p, pprev, tau, sigma) iter > 1 && pdresidual(p, pprev, tau, sigma) < 1e-6;
+term = @(iter, p, pprev, tau, sigma) pdresidual(p, pprev, tau, sigma) < 1e-6;
 
 % Define verbosity, logging, set plotting callback.
-alg = pdhg(tau, sigma, term, 100, @logenergy);
+alg = pdhg(tau, sigma, 50, term, 100, @logenergy);
 
 % Compute partial derivatives.
 fvec = f(:);
