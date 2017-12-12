@@ -29,7 +29,7 @@ y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
 groups = y([y.isdir]);
 
 % Define and create folder with results.
-resultfolder = 'results';
+resultfolder = fullfile('results', 'flow');
 mkdir(resultfolder);
 
 fprintf('Starting analysis of folder: %s\n', datapath);

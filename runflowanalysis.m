@@ -24,7 +24,10 @@ clc;
 recompute = false;
 
 % Set folder with results.
-resultfolder = 'results';
+resultfolder = fullfile('results', 'flow');
+
+% Set output folder.
+analysisfolder = fullfile('results', 'analysis');
 
 % Add all subfolders.
 y = dir(resultfolder);
@@ -55,4 +58,15 @@ for k=1:length(groups)
     end
 end
 
-% TODO: Add group/combined analysis
+% Combined analysis.
+for k=1:length(groups)
+    groupname = groups(k).name;
+    groupfolder = fullfile(resultfolder, groupname);
+    
+    fprintf('Group: %s\n', groupfolder);
+    
+    % Run analysis.
+    if(recompute || ~exist(fullfile(analysisfolder, groupname), 'dir'))
+        creategroupplots(groupname, groupfolder, analysisfolder);
+    end
+end
