@@ -1,5 +1,3 @@
-%%
-
 % Note:
 % (1) adjust the folder variable
 % (2) create a subfolder in folder named as 'images'
@@ -8,9 +6,9 @@
 % 'images'
 % (4) run this script
 %
-
-clear all;close all;clc;
-%%
+clear;
+close all;
+clc;
 %addpath(genpath(cd))
 
 %folder name

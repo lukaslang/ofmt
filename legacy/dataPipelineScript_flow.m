@@ -1,5 +1,3 @@
-%%
-
 % Note:
 % (1) adjust the folder variable
 % (2) create a subfolder in folder named as 'images'
@@ -8,13 +6,14 @@
 % 'images'
 % (4) run this script
 %
-
-clear all;close all;clc;
-%%
+clear;
+close all;
+clc;
 %addpath(genpath(cd))
 
 %folder name
-mainFolder = [datapath, '01_control'];
+mainFolder = fullfile('/home/ll542/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017 Reproduce/EB1 Data', 'control');
+%mainFolder = [datapath, '01_control'];
 %mainFolder = 'data';
 
 % Add all subfolders.
