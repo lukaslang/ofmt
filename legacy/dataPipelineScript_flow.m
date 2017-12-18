@@ -12,7 +12,7 @@ clc;
 %addpath(genpath(cd))
 
 %folder name
-mainFolder = fullfile('/home/ll542/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017 Reproduce/EB1 Data', 'control');
+mainFolder = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017 Reproduce/EB1 Data', 'control');
 %mainFolder = [datapath, '01_control'];
 %mainFolder = 'data';
 
