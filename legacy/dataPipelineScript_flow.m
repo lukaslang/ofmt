@@ -12,7 +12,7 @@ clc;
 %addpath(genpath(cd))
 
 %folder name
-mainFolder = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/New Data March 2017 Reproduce/EB1 Data', 'control');
+mainFolder = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/New Data March 2017 Reproduce/EB1 Data/control/');
 %mainFolder = [datapath, '01_control'];
 %mainFolder = 'data';
 
@@ -21,7 +21,11 @@ y = dir(mainFolder);
 y = y(~cellfun(@(x) strcmp(x, '.git') || strcmp(x, '.') || strcmp(x, '..'), {y.name}));
 listFolders = y([y.isdir]);
 
+fprintf('Starting analysis of folder: %s\n', mainFolder);
+fprintf('Found %i datasets.\n', length(listFolders));
+
 for i=1:numel(listFolders)
+    fprintf('Dataset: %s\n', listFolders(i).name);
     folder = [mainFolder,filesep,listFolders(i).name,filesep];
     result = dataPipelineFunction_flow(folder);
 end
