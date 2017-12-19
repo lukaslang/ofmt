@@ -12,7 +12,7 @@ clc;
 %addpath(genpath(cd))
 
 %folder name
-mainFolder = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/New Data March 2017 Reproduce/EB1 Data/control/');
+mainFolder = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/New Data March 2017 Reproduce/EB1 Data/fast flows/');
 %mainFolder = [datapath, '01_control'];
 %mainFolder = 'data';
 
@@ -27,5 +27,7 @@ fprintf('Found %i datasets.\n', length(listFolders));
 for i=1:numel(listFolders)
     fprintf('Dataset: %s\n', listFolders(i).name);
     folder = [mainFolder,filesep,listFolders(i).name,filesep];
+    tic;
     result = dataPipelineFunction_flow(folder);
+    toc;
 end

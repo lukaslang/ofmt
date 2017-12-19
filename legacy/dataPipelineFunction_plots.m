@@ -40,6 +40,19 @@ function result = dataPipelineFunction_plots(folder)
         error('No results found in folder %s. Run flow computation first.', folder);
     end
 
+    
+    %% Plot and output flow.
+    for i=1:size(imageStack,3)
+        singleField = squeeze(v(:,:,i,:));
+
+        %figure(1);imagesc(imageStack(:,:,i),[0,1]);axis image;colormap(gray);
+        %figure(2);imagesc(u(:,:,i),[0,1]);axis image;colormap(gray);
+        %figure(3);imagesc(flowToColorV2(singleField));axis image;colormap(gray);
+
+        exportImage(imageStack(:,:,i),[folder,'images',filesep,'input',num2str(i),'.png'],'colormap',gray);
+        exportImage(u(:,:,i),[folder,'images',filesep,'reconstructed',num2str(i),'.png'],'colormap',gray);
+        exportImage(flowToColorV2(singleField),[folder,'images',filesep,'flowField',num2str(i),'.png'],'colormap',gray);
+    end
 
     %%
     clear alpha beta gamma i mainIterations mainJoint numFrames singleField temporalSmoothness verbose; 

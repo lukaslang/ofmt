@@ -55,30 +55,14 @@ function result = dataPipelineFunction_flow(folder)
         mainJoint.numMainIt = mainIterations;
         %% run
 
-
         mainJoint.run;
 
         %%
         u = mainJoint.u;
         v = mainJoint.v;
 
-
-
         %% save data
         save([folder,'mat',filesep,'results.mat'],'u','v')
-        
-        for i=1:size(imageStack,3)
-            singleField = squeeze(v(:,:,i,:));
-
-            %figure(1);imagesc(imageStack(:,:,i),[0,1]);axis image;colormap(gray);
-            %figure(2);imagesc(u(:,:,i),[0,1]);axis image;colormap(gray);
-            %figure(3);imagesc(flowToColorV2(singleField));axis image;colormap(gray);
-
-            exportImage(imageStack(:,:,i),[folder,'images',filesep,'input',num2str(i),'.png'],'colormap',gray);
-            exportImage(u(:,:,i),[folder,'images',filesep,'reconstructed',num2str(i),'.png'],'colormap',gray);
-            exportImage(flowToColorV2(singleField),[folder,'images',filesep,'flowField',num2str(i),'.png'],'colormap',gray);
-
-        end
     
     end
 end

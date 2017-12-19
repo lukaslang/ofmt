@@ -20,7 +20,13 @@ y = dir(mainFolder);
 y = y(~cellfun(@(x) strcmp(x, '.git') || strcmp(x, '.') || strcmp(x, '..'), {y.name}));
 listFolders = y([y.isdir]);
 
+fprintf('Starting analysis of folder: %s\n', mainFolder);
+fprintf('Found %i datasets.\n', length(listFolders));
+
 for i=1:numel(listFolders)
+    fprintf('Dataset: %s\n', listFolders(i).name);
     folder = [mainFolder,filesep,listFolders(i).name,filesep];
+    tic;
     result = dataPipelineFunction_plots(folder);
+    toc;
 end
