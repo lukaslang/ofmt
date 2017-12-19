@@ -12,7 +12,8 @@ clc;
 %addpath(genpath(cd))
 
 %folder name
-mainFolder = [datapath, '01_control'];
+mainFolder = fullfile('/Users/lukaslang/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/New Data March 2017 Reproduce/EB1 Data/fast flows/');
+%mainFolder = [datapath, '01_control'];
 %mainFolder = 'data';
 
 % Add all subfolders.
