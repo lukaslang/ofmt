@@ -9,25 +9,31 @@
 clear;
 close all;
 clc;
-%addpath(genpath(cd))
-
-%folder name
-mainFolder = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017/03_khc[23]/');
-%mainFolder = [datapath, '01_control'];
-%mainFolder = 'data';
 
 % Add all subfolders.
-y = dir(mainFolder);
-y = y(~cellfun(@(x) strcmp(x, '.git') || strcmp(x, '.') || strcmp(x, '..'), {y.name}));
-listFolders = y([y.isdir]);
+y = dir(datapath);
+y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
+groups = y([y.isdir]);
 
-fprintf('Starting analysis of folder: %s\n', mainFolder);
-fprintf('Found %i datasets.\n', length(listFolders));
+fprintf('Starting analysis of folder: %s\n', datapath);
+fprintf('Found %i groups.\n', length(groups));
 
-for i=1:numel(listFolders)
-    fprintf('Dataset: %s\n', listFolders(i).name);
-    folder = [mainFolder,filesep,listFolders(i).name,filesep];
-    tic;
-    result = dataPipelineFunction_flow(folder);
-    toc;
+% Run through all groups.
+for k=1:length(groups)
+    groupname = groups(k).name;
+    % Run through all datasets.
+    y = dir(fullfile(datapath, groupname));
+    y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
+    datasets = y([y.isdir]);
+    for l=1:length(datasets)
+        dataset = datasets(l).name;
+        datafolder = fullfile(datapath, groupname, dataset, filesep);
+        
+        fprintf('Dataset: %s\n', fullfile(groupname, dataset));
+        
+        % Compute results.
+        tic;
+        dataPipelineFunction_flow(datafolder);
+        toc;
+    end
 end
