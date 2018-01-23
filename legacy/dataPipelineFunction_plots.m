@@ -76,7 +76,7 @@ function result = dataPipelineFunction_plots(folder, outputfolder)
 
     %% segmentationMapOuter
 
-    segmentationMapOuter = im2double((imread([outputfolder,filesep,'images',filesep,'segmentationMap.png'])));
+    segmentationMapOuter = im2double((imread([folder,'images',filesep,'segmentationMap.png'])));
     %segmentationMapOuter(segmentationMapOuter<1) = 0;
     segmentationMapOuter = imresize(segmentationMapOuter,[size(u,1),size(u,2)]);
     segmentationMapOuter(segmentationMapOuter>0) = 1;
