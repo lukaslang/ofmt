@@ -1,4 +1,4 @@
-function result = dataPipelineFunction_plots(folder)
+function result = dataPipelineFunction_plots(folder, outputfolder)
     result = 1;
 
     %% load data
@@ -8,6 +8,9 @@ function result = dataPipelineFunction_plots(folder)
     end
     if (~exist([folder,'images']))
         mkdir([folder,'images']);
+    end
+    if (~exist([outputfolder,'images']))
+        mkdir(fullfile(outputfolder, 'images'));
     end
     
     if (exist([folder,'mat',filesep,'rawData.mat'],'file'))
@@ -49,9 +52,9 @@ function result = dataPipelineFunction_plots(folder)
         %figure(2);imagesc(u(:,:,i),[0,1]);axis image;colormap(gray);
         %figure(3);imagesc(flowToColorV2(singleField));axis image;colormap(gray);
 
-        exportImage(imageStack(:,:,i),[folder,'images',filesep,'input',num2str(i),'.png'],'colormap',gray);
-        exportImage(u(:,:,i),[folder,'images',filesep,'reconstructed',num2str(i),'.png'],'colormap',gray);
-        exportImage(flowToColorV2(singleField),[folder,'images',filesep,'flowField',num2str(i),'.png'],'colormap',gray);
+        exportImage(imageStack(:,:,i),[outputfolder,filesep,'images',filesep,'input',num2str(i),'.png'],'colormap',gray);
+        exportImage(u(:,:,i),[outputfolder,filesep,'images',filesep,'reconstructed',num2str(i),'.png'],'colormap',gray);
+        exportImage(flowToColorV2(singleField),[outputfolder,filesep,'images',filesep,'flowField',num2str(i),'.png'],'colormap',gray);
     end
 
     %%
@@ -68,12 +71,12 @@ function result = dataPipelineFunction_plots(folder)
     %% create averaged flow field
     averagedMotionField = squeeze(sum(v,3) / size(v,3));
 
-    exportImage(flowToColorV2(averagedMotionField),[folder,'images',filesep,'averagedFlowField.png']);
+    exportImage(flowToColorV2(averagedMotionField),[outputfolder,filesep,'images',filesep,'averagedFlowField.png']);
 
 
     %% segmentationMapOuter
 
-    segmentationMapOuter = im2double((imread([folder,'images',filesep,'segmentationMap.png'])));
+    segmentationMapOuter = im2double((imread([outputfolder,filesep,'images',filesep,'segmentationMap.png'])));
     %segmentationMapOuter(segmentationMapOuter<1) = 0;
     segmentationMapOuter = imresize(segmentationMapOuter,[size(u,1),size(u,2)]);
     segmentationMapOuter(segmentationMapOuter>0) = 1;
@@ -111,7 +114,7 @@ function result = dataPipelineFunction_plots(folder)
     averagedMotionFieldNew = cat(3,averagedMotionField1,averagedMotionField2);
 
     figure(801);imagesc(flowToColorV2(averagedMotionFieldNew,5,1));axis image;
-    exportImage(flowToColorV2(averagedMotionFieldNew,5,1),[folder,'images',filesep,'flowAveragedOutside.png']);
+    exportImage(flowToColorV2(averagedMotionFieldNew,5,1),[outputfolder,filesep,'images',filesep,'flowAveragedOutside.png']);
 
 
     %% create images with velocities which correlate to intensities above a certain threshold
@@ -133,7 +136,7 @@ function result = dataPipelineFunction_plots(folder)
 
     %%
 
-    exportImage(flowToColorV2(averagedMotionField),[folder,'images',filesep,'averagedFlowFieldInner.png']);
+    exportImage(flowToColorV2(averagedMotionField),[outputfolder,filesep,'images',filesep,'averagedFlowFieldInner.png']);
 
     %%
     %transform averaged field into polar coordinates
@@ -156,7 +159,7 @@ function result = dataPipelineFunction_plots(folder)
     [angleHist,angleCenters] = hist(angle,360);
 
     figure(5);polar(1,1);
-    print([folder,'images',filesep,'angleOverview'],'-dpng','-r0')
+    print([outputfolder,filesep,'images',filesep,'angleOverview'],'-dpng','-r0')
 
     meanAngle = mean(angle);
     % Modified since we don't have Curve Fitting Toolbox.
@@ -165,22 +168,22 @@ function result = dataPipelineFunction_plots(folder)
 
 
 
-    print([folder,'images',filesep,'anglePlot'],'-dpng','-r0')
+    print([outputfolder,filesep,'images',filesep,'anglePlot'],'-dpng','-r0')
 
     figure(7);rose(degtorad(angle),100);
-    print([folder,'images',filesep,'angleRoseDiagramFine'],'-dpng','-r0')
+    print([outputfolder,filesep,'images',filesep,'angleRoseDiagramFine'],'-dpng','-r0')
 
     figure(8);rose(degtorad(angle),8);
-    print([folder,'images',filesep,'angleRoseDiagramCoarse'],'-dpng','-r0')
+    print([outputfolder,filesep,'images',filesep,'angleRoseDiagramCoarse'],'-dpng','-r0')
     
     
     [tout,rout] = rose(degtorad(angle),100);
     figure(9);polar(tout,rout/numel(angle))
-    print([folder,'images',filesep,'angleRoseDiagramFineRelative'],'-dpng','-r0')
+    print([outputfolder,filesep,'images',filesep,'angleRoseDiagramFineRelative'],'-dpng','-r0')
     
     [tout,rout] = rose(degtorad(angle),8);
     figure(10);polar(tout,rout/numel(angle))
-    print([folder,'images',filesep,'angleRoseDiagramCoarseRelative'],'-dpng','-r0')
+    print([outputfolder,filesep,'images',filesep,'angleRoseDiagramCoarseRelative'],'-dpng','-r0')
     
 
 end

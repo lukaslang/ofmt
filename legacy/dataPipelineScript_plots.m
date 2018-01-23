@@ -10,6 +10,9 @@ clear;
 close all;
 clc;
 
+% Set output folder.
+resultfolder = 'results';
+
 % Add all subfolders.
 y = dir(datapath);
 y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
@@ -28,12 +31,15 @@ for k=1:length(groups)
     for l=1:length(datasets)
         dataset = datasets(l).name;
         datafolder = fullfile(datapath, groupname, dataset, filesep);
-        
         fprintf('Dataset: %s\n', fullfile(groupname, dataset));
+        
+        % Create output folder.
+        outputfolder = fullfile(resultfolder, groupname, dataset);
+        mkdir(outputfolder);
         
         % Create plots.
         tic;
-        dataPipelineFunction_plots(datafolder);
+        dataPipelineFunction_plots(datafolder, outputfolder);
         toc;
     end
 end
