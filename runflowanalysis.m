@@ -24,10 +24,10 @@ clc;
 recompute = false;
 
 % Set folder with results.
-resultfolder = fullfile('results', 'flow');
+resultfolder = fullfile('results-full', 'flow');
 
 % Set output folder.
-analysisfolder = fullfile('results', 'analysis');
+analysisfolder = fullfile('results-full', 'analysis');
 
 % Add all subfolders.
 y = dir(resultfolder);

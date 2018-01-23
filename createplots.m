@@ -79,13 +79,13 @@ close(h);
 [theta, rho] = cart2pol(v1 .* seg, -v2 .* seg);
 
 % Scatter plot for velocities within segmentation.
-h = figure(1);
-polarscatter(theta(:), rho(:), 10, '.');
-title('Velocities inside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-all-scatter-inside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
+% h = figure(1);
+% polarscatter(theta(:), rho(:), 10, '.');
+% title('Velocities inside segmentation.', 'Interpreter', 'latex');
+% set(gca, 'FontName', 'Helvetica' );
+% set(gca, 'FontSize', 20);
+% export_fig(h, fullfile(outputFolder, 'flow-all-scatter-inside.png'), '-png', '-q100', '-a1', '-transparent');
+% close(h);
 
 % Find vectors where length is larger than epsilon.
 idx = rho >= 1e-5;
@@ -105,13 +105,13 @@ close(h);
 [theta, rho] = cart2pol(v1 .* ~seg, -v2 .* ~seg);
 
 % Scatter plot for velocities outside segmentation.
-h = figure(1);
-polarscatter(theta(:), rho(:), 10, '.');
-title('Velocities outside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-all-scatter-outside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
+% h = figure(1);
+% polarscatter(theta(:), rho(:), 10, '.');
+% title('Velocities outside segmentation.', 'Interpreter', 'latex');
+% set(gca, 'FontName', 'Helvetica' );
+% set(gca, 'FontSize', 20);
+% export_fig(h, fullfile(outputFolder, 'flow-all-scatter-outside.png'), '-png', '-q100', '-a1', '-transparent');
+% close(h);
 
 % Find vectors where length is larger than epsilon.
 idx = rho >= 1e-5;
@@ -136,13 +136,13 @@ meanv2 = mean(v2, 3);
 [theta, rho] = cart2pol(meanv1 .* seg, -meanv2 .* seg);
 
 % Scatter plot.
-h = figure(1);
-polarscatter(theta(:), rho(:), 10, '.');
-title('Mean velocities inside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-mean-scatter-inside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
+% h = figure(1);
+% polarscatter(theta(:), rho(:), 10, '.');
+% title('Mean velocities inside segmentation.', 'Interpreter', 'latex');
+% set(gca, 'FontName', 'Helvetica' );
+% set(gca, 'FontSize', 20);
+% export_fig(h, fullfile(outputFolder, 'flow-mean-scatter-inside.png'), '-png', '-q100', '-a1', '-transparent');
+% close(h);
 
 % Find vectors where length is larger than epsilon.
 idx = rho >= 1e-5;
@@ -176,13 +176,13 @@ meanv2 = mean(v2, 3);
 [theta, rho] = cart2pol(meanv1 .* ~seg, -meanv2 .* ~seg);
 
 % Scatter plot.
-h = figure(1);
-polarscatter(theta(:), rho(:), 10, '.');
-title('Mean velocities outside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-mean-scatter-outside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
+% h = figure(1);
+% polarscatter(theta(:), rho(:), 10, '.');
+% title('Mean velocities outside segmentation.', 'Interpreter', 'latex');
+% set(gca, 'FontName', 'Helvetica' );
+% set(gca, 'FontSize', 20);
+% export_fig(h, fullfile(outputFolder, 'flow-mean-scatter-outside.png'), '-png', '-q100', '-a1', '-transparent');
+% close(h);
 
 % Find vectors where length is larger than epsilon.
 idx = rho >= 1e-5;

@@ -61,13 +61,13 @@ mkdir(outputFolder);
 idx = rho >= 1e-5;
 
 % Scatter plot for velocities within segmentation.
-h = figure(1);
-polarscatter(theta(idx), rho(idx), 10, '.');
-title('Velocities inside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-all-scatter-inside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
+% h = figure(1);
+% polarscatter(theta(idx), rho(idx), 10, '.');
+% title('Velocities inside segmentation.', 'Interpreter', 'latex');
+% set(gca, 'FontName', 'Helvetica' );
+% set(gca, 'FontSize', 20);
+% export_fig(h, fullfile(outputFolder, 'flow-all-scatter-inside.png'), '-png', '-q100', '-a1', '-transparent');
+% close(h);
 
 % Polar histogram for velocities within segmentation.
 h = figure(1);
@@ -100,13 +100,13 @@ meanv2 = mean(v2, 3);
 idx = rho >= 1e-5;
 
 % Scatter plot.
-h = figure(1);
-polarscatter(theta(idx), rho(idx), 10, '.');
-title('Mean velocities inside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-mean-scatter-inside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
+% h = figure(1);
+% polarscatter(theta(idx), rho(idx), 10, '.');
+% title('Mean velocities inside segmentation.', 'Interpreter', 'latex');
+% set(gca, 'FontName', 'Helvetica' );
+% set(gca, 'FontSize', 20);
+% export_fig(h, fullfile(outputFolder, 'flow-mean-scatter-inside.png'), '-png', '-q100', '-a1', '-transparent');
+% close(h);
 
 % Histogram plot.
 h = figure(1);
