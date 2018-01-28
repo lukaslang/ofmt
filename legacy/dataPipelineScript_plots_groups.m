@@ -21,7 +21,7 @@ close all;
 clc;
 
 % Set result folder.
-resultfolder = 'results';
+resultfolder = fullfile('results', 'groups');
 
 % Add all subfolders.
 y = dir(datapath);
@@ -63,7 +63,7 @@ for l=1:length(datasets)
     % Check if result file exists.
     if(~exist(fullfile(folder, 'mat', 'results.mat'), 'file'))
         warning('No result found for dataset: %s.\n', folder);
-       continue; 
+       continue;
     end
     
     % Load data.
@@ -94,7 +94,7 @@ mkdir(outputFolder);
 [theta, rho] = cart2pol(v1 .* seg, -v2 .* seg);
 
 % Find vectors where length is larger than epsilon.
-idx = rho >= 1e-5;
+idx = abs(rho) >= 1e-3;
 
 % Scatter plot for velocities within segmentation.
 % h = figure(1);
@@ -108,7 +108,7 @@ idx = rho >= 1e-5;
 % Polar histogram for velocities within segmentation.
 h = figure(1);
 polarhistogram(theta(idx), 50, 'Normalization', 'probability');
-title('Histogram of velocities inside segmentation.', 'Interpreter', 'latex');
+title('Histogram of angles inside segmentation.', 'Interpreter', 'latex');
 set(gca, 'FontName', 'Helvetica' );
 set(gca, 'FontSize', 20);
 export_fig(h, fullfile(outputFolder, 'flow-all-histogram-inside.png'), '-png', '-q100', '-a1', '-transparent');
@@ -117,13 +117,13 @@ close(h);
 % Binary polar histogram for velocities within segmentation.
 h = figure(1);
 polarhistogram(theta(idx), 'BinEdges', [-pi/2, pi/2, 3*pi/2], 'Normalization', 'probability');
-title('Histogram of velocities inside segmentation.', 'Interpreter', 'latex');
+title('Histogram of angles inside segmentation.', 'Interpreter', 'latex');
 set(gca, 'FontName', 'Helvetica' );
 set(gca, 'FontSize', 20);
 export_fig(h, fullfile(outputFolder, 'flow-all-histogram-polar-inside.png'), '-png', '-q100', '-a1', '-transparent');
 close(h);
 
-%% Visualise mean of velocities within segmentation. 
+%% Visualise mean of velocities within segmentation.
 
 % Compute average velocities.
 meanv1 = mean(v1, 3);
@@ -133,7 +133,7 @@ meanv2 = mean(v2, 3);
 [theta, rho] = cart2pol(meanv1 .* seg, -meanv2 .* seg);
 
 % Find vectors where length is larger than epsilon.
-idx = rho >= 1e-5;
+idx = abs(rho) >= 1e-3;
 
 % Scatter plot.
 % h = figure(1);
@@ -147,7 +147,7 @@ idx = rho >= 1e-5;
 % Histogram plot.
 h = figure(1);
 polarhistogram(theta(idx), 50, 'Normalization', 'probability');
-title('Mean velocities inside segmentation.', 'Interpreter', 'latex');
+title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
 set(gca, 'FontName', 'Helvetica' );
 set(gca, 'FontSize', 20);
 export_fig(h, fullfile(outputFolder, 'flow-mean-histogram-inside.png'), '-png', '-q100', '-a1', '-transparent');
@@ -156,7 +156,7 @@ close(h);
 % Binary polar histogram for velocities within segmentation.
 h = figure(1);
 polarhistogram(theta(idx), 'BinEdges', [-pi/2, pi/2, 3*pi/2], 'Normalization', 'probability');
-title('Histogram of velocities inside segmentation.', 'Interpreter', 'latex');
+title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
 set(gca, 'FontName', 'Helvetica' );
 set(gca, 'FontSize', 20);
 export_fig(h, fullfile(outputFolder, 'flow-mean-histogram-polar-inside.png'), '-png', '-q100', '-a1', '-transparent');
