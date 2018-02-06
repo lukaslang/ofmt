@@ -115,13 +115,13 @@ export_fig(h, fullfile(outputFolder, 'flow-all-histogram-inside.png'), '-png', '
 close(h);
 
 % Binary polar histogram for velocities within segmentation.
-h = figure(1);
-polarhistogram(theta(idx), 'BinEdges', [-pi/2, pi/2, 3*pi/2], 'Normalization', 'probability');
-title('Histogram of angles inside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-all-histogram-polar-inside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
+% h = figure(1);
+% polarhistogram(theta(idx), 'BinEdges', [-pi/2, pi/2, 3*pi/2], 'Normalization', 'probability');
+% title('Histogram of angles inside segmentation.', 'Interpreter', 'latex');
+% set(gca, 'FontName', 'Helvetica' );
+% set(gca, 'FontSize', 20);
+% export_fig(h, fullfile(outputFolder, 'flow-all-histogram-polar-inside.png'), '-png', '-q100', '-a1', '-transparent');
+% close(h);
 
 %% Visualise mean of velocities within segmentation.
 
@@ -154,12 +154,12 @@ export_fig(h, fullfile(outputFolder, 'flow-mean-histogram-inside.png'), '-png', 
 close(h);
 
 % Binary polar histogram for velocities within segmentation.
-h = figure(1);
-polarhistogram(theta(idx), 'BinEdges', [-pi/2, pi/2, 3*pi/2], 'Normalization', 'probability');
-title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
-set(gca, 'FontName', 'Helvetica' );
-set(gca, 'FontSize', 20);
-export_fig(h, fullfile(outputFolder, 'flow-mean-histogram-polar-inside.png'), '-png', '-q100', '-a1', '-transparent');
-close(h);
+% h = figure(1);
+% polarhistogram(theta(idx), 'BinEdges', [-pi/2, pi/2, 3*pi/2], 'Normalization', 'probability');
+% title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
+% set(gca, 'FontName', 'Helvetica' );
+% set(gca, 'FontSize', 20);
+% export_fig(h, fullfile(outputFolder, 'flow-mean-histogram-polar-inside.png'), '-png', '-q100', '-a1', '-transparent');
+% close(h);
 
 end
