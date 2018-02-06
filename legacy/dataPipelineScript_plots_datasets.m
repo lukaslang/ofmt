@@ -109,17 +109,20 @@ function createplots(outputFolder, dataset, v1, v2, seg)
 %
 %   CREATEPLOTS(groupname, groupfolder, ouputfolder) takes the
 %   group name, the folder where results are, and an ouput folder.
-    
-    % Set segmentation to be one inside and zero outside.
-    seg = seg > 0;
 
+    % Replicate.
+    segt = repmat(seg, 1, 1, size(v1, 3));
+    
+    % Find segmentation.
+    idx = segt > 0;
+    
     %% Visualise velocities within segmentation.
 
     % Convert velocities polar coordinates.
-    [theta, rho] = cart2pol(v1 .* seg, -v2 .* seg);
+    [theta, rho] = cart2pol(v1, -v2);
 
     % Find vectors where length is larger than epsilon.
-    idx = abs(rho) >= 1e-3;
+    %idx = abs(rho) >= 1e-3;
 
     % Scatter plot for velocities within segmentation.
 %     h = figure(1);
@@ -150,24 +153,27 @@ function createplots(outputFolder, dataset, v1, v2, seg)
 
     %% Visualise mean of velocities within segmentation.
 
-    % Compute average velocities.
-    meanv1 = mean(v1, 3);
-    meanv2 = mean(v2, 3);
+    % Compute average velocities within segmentation.
+    meanv1 = mean(v1, 3) .* seg;
+    meanv2 = mean(-v2, 3) .* seg;
 
     % Convert to polar coordinates.
-    [theta, rho] = cart2pol(meanv1 .* seg, -meanv2 .* seg);
+    [theta, rho] = cart2pol(meanv1, meanv2);
 
     % Find vectors where length is larger than epsilon.
-    idx = abs(rho) >= 1e-3;
+    %idx = abs(rho) >= 1e-3;
+    
+    % Find segmentation.
+    idx = seg > 0;
 
     % Scatter plot.
-%     h = figure(1);
-%     polarscatter(theta(idx), rho(idx), 10, '.');
-%     title('Mean velocities inside segmentation.', 'Interpreter', 'latex');
-%     set(gca, 'FontName', 'Helvetica' );
-%     set(gca, 'FontSize', 20);
-%     export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-scatter-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
-%     close(h);
+    h = figure(1);
+    polarscatter(theta(idx), rho(idx), 10, '.');
+    title('Mean velocities inside segmentation.', 'Interpreter', 'latex');
+    set(gca, 'FontName', 'Helvetica' );
+    set(gca, 'FontSize', 20);
+    export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-scatter-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
 
     % Histogram plot.
     h = figure(1);
@@ -189,7 +195,7 @@ function createplots(outputFolder, dataset, v1, v2, seg)
     
     % Colour-coding of mean velocities.
     h = figure(1);
-    imagesc(flowToColorV2(cat(3, meanv1 .* seg, meanv2 .* seg)));
+    imagesc(flowToColorV2(cat(3, meanv1, meanv2)));
     axis image;
     title('Colour-coding of mean velocities inside segmentation.', 'Interpreter', 'latex');
     set(gca, 'FontName', 'Helvetica' );
