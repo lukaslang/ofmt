@@ -67,7 +67,9 @@ ds = unique(ds);
 
 % Iterate through unique datasets.
 for k=1:length(ds)
-    % Create vector fields.
+    % Initialise.
+    f = [];
+    u = [];
     v1 = [];
     v2 = [];
     seg = [];
@@ -81,14 +83,16 @@ for k=1:length(ds)
         fprintf('Sequence: %s\n', folder);
         
         % Check if result file exists.
-        if(~exist(fullfile(folder, 'mat', 'results.mat'), 'file'))
-            warning('No result found for sequence: %s.\n', folder);
+        if(~(exist(fullfile(folder, 'mat', 'results.mat'), 'file') && exist(fullfile(folder, 'mat', 'rawData.mat'), 'file')))
+            warning('No result or data found for sequence: %s.\n', folder);
            continue; 
         end
 
         % Load data.
-        %load(fullfile(folder, 'results-denoising.mat'), 'f');
-        V = load(fullfile(folder, 'mat', 'results.mat'), 'v');
+        W = load(fullfile(folder, 'mat', 'rawData.mat'), 'imageStack');
+        f = W.imageStack;
+        V = load(fullfile(folder, 'mat', 'results.mat'), 'v', 'u');
+        u = V.u;
         v1 = cat(3, v1, V.v(:, :, :, 1));
         v2 = cat(3, v2, V.v(:, :, :, 2));
 
@@ -100,15 +104,12 @@ for k=1:length(ds)
     end
     
     % Create plots.
-    createplots(outputFolder, ds{k}, v1, v2, seg)
+    createplots(outputFolder, ds{k}, v1, v2, seg, f, u)
 end
 end
 
-function createplots(outputFolder, dataset, v1, v2, seg)
+function createplots(outputFolder, dataset, v1, v2, seg, f, u)
 %CREATEPLOTS Creates plots and figures for each group.
-%
-%   CREATEPLOTS(groupname, groupfolder, ouputfolder) takes the
-%   group name, the folder where results are, and an ouput folder.
 
     % Replicate.
     segt = repmat(seg, 1, 1, size(v1, 3));
@@ -122,7 +123,7 @@ function createplots(outputFolder, dataset, v1, v2, seg)
     [theta, rho] = cart2pol(v1, -v2);
 
     % Find vectors where length is larger than epsilon.
-    %idx = abs(rho) >= 1e-3;
+    idx = idx & abs(rho) >= 1e-3;
 
     % Scatter plot for velocities within segmentation.
 %     h = figure(1);
@@ -159,12 +160,12 @@ function createplots(outputFolder, dataset, v1, v2, seg)
 
     % Convert to polar coordinates.
     [theta, rho] = cart2pol(meanv1, meanv2);
-
-    % Find vectors where length is larger than epsilon.
-    %idx = abs(rho) >= 1e-3;
     
     % Find segmentation.
     idx = seg > 0;
+    
+    % Find vectors where length is larger than epsilon.
+    idx = idx & abs(rho) >= 1e-3;
 
     % Scatter plot.
     h = figure(1);
@@ -195,11 +196,36 @@ function createplots(outputFolder, dataset, v1, v2, seg)
     
     % Colour-coding of mean velocities.
     h = figure(1);
-    imagesc(flowToColorV2(cat(3, meanv1, meanv2)));
+    imagesc(flowToColorV2(cat(3, meanv1, -meanv2)));
     axis image;
     title('Colour-coding of mean velocities inside segmentation.', 'Interpreter', 'latex');
     set(gca, 'FontName', 'Helvetica' );
     set(gca, 'FontSize', 20);
     export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
     close(h);
+    
+    % First frame of noisy image.
+    h = figure(1);
+    colormap gray;
+    imagesc(f(:, :, 1));
+    daspect([1, 1, 1]);
+    axis off;
+    title('First frame of noisy input.', 'Interpreter', 'latex');
+    set(gca, 'FontName', 'Helvetica' );
+    set(gca, 'FontSize', 20);
+    export_fig(h, fullfile(outputFolder, sprintf('%s-first-frame.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+    
+    % First frame of reconstructed image.
+    h = figure(1);
+    colormap gray;
+    imagesc(u(:, :, 1));
+    daspect([1, 1, 1]);
+    axis off;
+    title('First frame of reconstruction.', 'Interpreter', 'latex');
+    set(gca, 'FontName', 'Helvetica' );
+    set(gca, 'FontSize', 20);
+    export_fig(h, fullfile(outputFolder, sprintf('%s-first-frame-reconstructed.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+    
 end
