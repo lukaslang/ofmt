@@ -54,7 +54,7 @@ for k=1:length(groups)
     % Create plots.
     %name = dataset{k};
     name = 'sample';
-    createplots(outputFolder, name, v1, v2, seg, f, u);
+    %createplots(outputFolder, name, v1, v2, seg, f, u);
 end
 
 %% Plot polar histogram for each group.
@@ -99,8 +99,7 @@ for k=1:length(groups)
         %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
         hold on;
     end
-    set(gca, 'FontName', 'Helvetica' );
-    set(gca, 'FontSize', 20);
+    adjustfigure();
     export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
     close(h);
     
@@ -121,8 +120,7 @@ for k=1:length(groups)
         %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
         hold on;
     end
-    set(gca, 'FontName', 'Helvetica' );
-    set(gca, 'FontSize', 20);
+    adjustfigure();
     export_fig(h, fullfile(outputFolder, sprintf('%s-mean-velocities-inside.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
     close(h);
 end
@@ -145,19 +143,54 @@ for k=1:length(groups)
     fprintf('Group: %s\n', groupfolder);
     
     % Run analysis.
-    if(~exist(fullfile(resultfolder, groupname), 'dir'))
-        [ds, v1, v2, seg, f, u] = loaddatasets(groupname, groupfolder, resultfolder);
-        
-        % Run through datasets.
-        for l=1:length(ds)
-            % Create output folder.
-            outputFolder = fullfile(resultfolder, groupname, ds{l});
-            mkdir(outputFolder);
-            % Create plots.
-            createplots(outputFolder, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
-        end
+    [ds, v1, v2, seg, f, u] = loaddatasets(groupname, groupfolder, resultfolder);
+
+    % Run through datasets.
+    for l=1:length(ds)
+        % Create output folder.
+        outputFolder = fullfile(resultfolder, removebrackets(groupname), ds{l});
+        mkdir(outputFolder);
+        % Create plots.
+        createplots(outputFolder, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
     end
 end
+
+
+%% Analyse regions.
+
+% % Add all subfolders.
+% y = dir(datapath);
+% y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
+% groups = y([y.isdir]);
+% 
+% fprintf('Starting analysis of folder: %s\n', datapath);
+% fprintf('Found %i groups.\n', length(groups));
+% 
+% % Define regions.
+% keySet = {'01_control', '02_capu_EY12344_'};
+% valueSet = {};
+% R = containers.Map(keySet, valueSet);
+% 
+% for k=1:length(groups)
+%     groupname = groups(k).name;
+%     groupfolder = fullfile(datapath, groupname);
+%     
+%     fprintf('Group: %s\n', groupfolder);
+%     
+%     % Run analysis.
+%     [ds, v1, v2, seg, f, u] = loaddatasets(groupname, groupfolder, resultfolder);
+% 
+%     % Run through datasets.
+%     for l=1:length(ds)
+%         % Create output folder.
+%         outputFolder = fullfile(resultfolder, removebrackets(groupname), ds{l});
+%         mkdir(outputFolder);
+%         % Create plots.
+%         createplots(outputFolder, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
+%     end
+% end
+
+%%
 
 function str = removebrackets(str)
 
@@ -237,8 +270,7 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
     daspect([1, 1, 1]);
     axis off;
     %title('First frame of noisy input.', 'Interpreter', 'latex');
-    set(gca, 'FontName', 'Helvetica' );
-    set(gca, 'FontSize', 20);
+    adjustfigure();
     export_fig(h, fullfile(outputFolder, sprintf('%s-first-frame-noisy.png', dataset)), '-png', '-q100', '-a1', '-transparent');
     close(h);
     
@@ -249,8 +281,7 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
     daspect([1, 1, 1]);
     axis off;
     %title('First frame of reconstruction.', 'Interpreter', 'latex');
-    set(gca, 'FontName', 'Helvetica' );
-    set(gca, 'FontSize', 20);
+    adjustfigure();
     export_fig(h, fullfile(outputFolder, sprintf('%s-first-frame-reconstructed.png', dataset)), '-png', '-q100', '-a1', '-transparent');
     close(h);
 
@@ -272,8 +303,8 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
 %     h = figure(1);
 %     polarscatter(theta(idx), rho(idx), 10, '.');
 %     title('Velocities inside segmentation.', 'Interpreter', 'latex');
-%     set(gca, 'FontName', 'Helvetica' );
-%     set(gca, 'FontSize', 20);
+%     set(gca, 'FontName', font);
+%     set(gca, 'FontSize', fontsize);
 %     export_fig(h, fullfile(outputFolder, sprintf('%s-flow-all-scatter-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
 %     close(h);
 
@@ -281,8 +312,8 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
 %     h = figure(1);
 %     polarhistogram(theta(idx), 50, 'Normalization', 'probability');
 %     title('Histogram of angles inside segmentation.', 'Interpreter', 'latex');
-%     set(gca, 'FontName', 'Helvetica' );
-%     set(gca, 'FontSize', 20);
+%     set(gca, 'FontName', font);
+%     set(gca, 'FontSize', fontsize);
 %     export_fig(h, fullfile(outputFolder, sprintf('%s-flow-all-histogram-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
 %     close(h);
 
@@ -302,8 +333,7 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
     h = figure(1);
     polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceColor', [1, 1, 1]./3, 'FaceAlpha', 0.3);
     %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
-    set(gca, 'FontName', 'Helvetica' );
-    set(gca, 'FontSize', 20);
+    adjustfigure();
     export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-histogram-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
     close(h);
 
@@ -313,8 +343,7 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
     daspect([1, 1, 1]);
     axis off;
     %title('Colour-coding of mean velocities inside segmentation.', 'Interpreter', 'latex');
-    set(gca, 'FontName', 'Helvetica' );
-    set(gca, 'FontSize', 20);
+    adjustfigure();
     export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
     close(h);
     
@@ -327,8 +356,19 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
     hold on;
     polarplot([0, thetam], [0, rhom], 'r-');
     %title('Mean velocities inside segmentation.', 'Interpreter', 'latex');
-    set(gca, 'FontName', 'Helvetica' );
-    set(gca, 'FontSize', 20);
+    adjustfigure();
     export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-scatter-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
     close(h);
+    
+    % Histogram of magnitudes.
+    h = figure(1);
+    histogram(rho);
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-histogram-magnitude-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+end
+
+function adjustfigure()
+    set(gca, 'FontName', 'Arial');
+    set(gca, 'FontSize', 20);
 end

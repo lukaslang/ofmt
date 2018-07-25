@@ -18,5 +18,5 @@ function p = datapath
 %DATAPATH Returns the path where the data is stored.
 
 %p = fullfile('/Users/lukaslang/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017/');
-%p = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017-split/');
-p = fullfile('/Users/lukaslang/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017-split/');
+p = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017-split/');
+%p = fullfile('/Users/lukaslang/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017-split/');

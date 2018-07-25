@@ -5,10 +5,10 @@ close all;
 clc;
 
 % Folder name.
-datafolder = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017/');
+datafolder = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data July 2018/');
 
 % Output folder.
-outputfolder = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017-split/');
+outputfolder = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data July 2018-split/');
 
 % Sequence length.
 maxlength = 50;
