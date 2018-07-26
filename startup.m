@@ -24,10 +24,10 @@ libraryPath = '../';
 addpath(genpath(fullfile(libraryPath, 'export_fig')));
 
 % FlexBox is required for denoising and optical flow computation.
-%addpath(genpath(fullfile(libraryPath, 'flexBox')));
+addpath(genpath(fullfile(libraryPath, 'flexBox')));
 
 % motionEstimationGUI is used for optical flow computation.
-%addpath(genpath(fullfile(libraryPath, 'motionEstimationGUI')));
+addpath(genpath(fullfile(libraryPath, 'motionEstimationGUI')));
 
 % Add all subfolders.
 y = dir('.');
