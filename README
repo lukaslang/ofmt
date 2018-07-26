@@ -48,13 +48,54 @@ The license statements can be found in the respective folders.
 
 3. Requirements
 
-This software was originally written for and tested with Matlab R2016a.
+This software was originally written for and tested with Matlab R2016b.
 
 The following libraries are required for parts of this sofware:
 
 export_fig: used for producing high quality figures from the results.
 GitHub: https://github.com/altmany/export_fig
 URL: http://www.mathworks.com/matlabcentral/fileexchange/23629-exportfig
+
+>> git clone https://github.com/altmany/export_fig.git
+
+flexBox: used for optical flow computation.
+GitHub: https://github.com/lukaslang/flexBox.git
+Version used: a4a24d0d680b3d2d8bc87869bde812e80750f745
+
+>> git clone -recursive https://github.com/lukaslang/flexBox.git
+>> cd flexBox
+>> git checkout a4a24d0d680b3d2d8bc87869bde812e80750f745
+
+motionEstimationGUI: used for large motion.
+GitHub: https://github.com/HendrikMuenster/motionEstimationGUI
+Version used: 15c578a12e968a46afbe8afe571060c3ccd41e71
+
+>> git clone https://github.com/HendrikMuenster/motionEstimationGUI.git
+>> cd motionEstimationGUI
+>> git checkout 15c578a12e968a46afbe8afe571060c3ccd41e71
+
+To run experiments with compiled flexBox follow these steps:
+
+>> cd flexBox/flexBox_CPP/
+>> mkdir build
+>> cd build
+>> cmake -DUSE_CUDA=ON -DCUDA_CUDART_LIBRARY=/usr/local/cuda/lib64/libcudart.so -DCUDA_cufft_LIBRARY=/usr/local/cuda/lib64/libcufft.so -DCUDA_cusparse_LIBRARY=/usr/local/cuda/lib64/libcusparse.so ../source/
+>> make
+>> make install
+
+Tested with NVIDIA Tesla K40c run on Ubuntu 16.04.4, CUDA 8, and Matlab 2016b.
+
+On MacOS (High Sierra, 10.13.4) together with Matlab 2017b you can run:
+
+>> brew reinstall gcc --without-multilib
+# See https://stackoverflow.com/a/19016410
+>> sudo ln -s /opt/X11/include/X11 /usr/local/include/X11
+>> cd flexBox/flexBox_CPP/
+>> mkdir build
+>> cd build
+>> CC=gcc-8 CXX=g++-8 cmake -D Matlab_ROOT_DIR=/Applications/MATLAB_R2017b.app/ ../source/
+>> make
+>> make install
 
 4. Usage
 
