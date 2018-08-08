@@ -49,7 +49,7 @@ for k=1:length(groups)
 
     % Create output folder.
     outputFolder = fullfile(resultfolder, removebrackets(groupname));
-    mkdir(outputFolder);
+    % mkdir(outputFolder);
     
     % Create plots.
     %name = dataset{k};
@@ -82,6 +82,8 @@ for k=1:length(groups)
     [ds, v1, v2, seg, f, u] = loaddatasets(groupname, groupfolder, resultfolder);
     
     % Histogram plot.
+    outputFolder = fullfile(resultfolder, 'mean-histogram-inside');
+    mkdir(outputFolder);
     h = figure(1);
     for l=1:length(ds)
         % Compute average velocities within segmentation.
@@ -105,6 +107,8 @@ for k=1:length(groups)
     close(h);
     
     % Binary polar histogram.
+    outputFolder = fullfile(resultfolder, 'mean-histogram-inside-binary');
+    mkdir(outputFolder);
     h = figure(1);
     for l=1:length(ds)
         % Compute average velocities within segmentation.
@@ -127,6 +131,8 @@ for k=1:length(groups)
     close(h);
     
     % Group polar histogram.
+    outputFolder = fullfile(resultfolder, 'mean-histogram-inside-group');
+    mkdir(outputFolder);
     perc = zeros(length(ds), 4);
     h = figure(1);
     for l=1:length(ds)
@@ -151,6 +157,8 @@ for k=1:length(groups)
     close(h);
     
     % Group boxplot.
+    outputFolder = fullfile(resultfolder, 'mean-histogram-inside-boxplot');
+    mkdir(outputFolder);
     h = figure(1);
     boxplot(perc, 'Labels', {'270-330', '330-30', '30-90', '90-270'});
     xlabel('Region in degrees');
@@ -160,6 +168,8 @@ for k=1:length(groups)
     close(h);
     
     % Average velocity plot.
+    outputFolder = fullfile(resultfolder, 'mean-velocities-inside');
+    mkdir(outputFolder);
     h = figure(1);
     for l=1:length(ds)
         % Compute average velocities within segmentation.
@@ -181,6 +191,8 @@ for k=1:length(groups)
     close(h);
     
     % Mean angle plot.
+    outputFolder = fullfile(resultfolder, 'mean-angles-inside');
+    mkdir(outputFolder);
     h = figure(1);
     for l=1:length(ds)
         % Compute average velocities within segmentation.
@@ -228,11 +240,8 @@ for k=1:length(groups)
 
     % Run through datasets.
     for l=1:length(ds)
-        % Create output folder.
-        outputFolder = fullfile(resultfolder, removebrackets(groupname), ds{l});
-        mkdir(outputFolder);
         % Create plots.
-        createplots(outputFolder, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
+        createplots(resultfolder, groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
     end
 end
 
@@ -365,10 +374,12 @@ v2 = v2 * pixelSize(dataset) / interval;
 
 end
 
-function createplots(outputFolder, dataset, v1, v2, seg, f, u)
+function createplots(resultfolder, groupname, dataset, v1, v2, seg, f, u)
 %CREATEPLOTS Creates plots and figures for each group.
 
     % First frame of noisy image.
+    outputFolder = fullfile(resultfolder, 'first-frame-noisy', removebrackets(groupname));
+    mkdir(outputFolder);
     h = figure(1);
     colormap gray;
     imagesc(f(:, :, 1));
@@ -380,6 +391,8 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
     close(h);
     
     % First frame of reconstructed image.
+    outputFolder = fullfile(resultfolder, 'first-frame-reconstructed', removebrackets(groupname));
+    mkdir(outputFolder);
     h = figure(1);
     colormap gray;
     imagesc(u(:, :, 1));
@@ -435,6 +448,8 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
     idx = seg > 0; % & abs(rho) >= 1e-3;
 
     % Histogram plot.
+    outputFolder = fullfile(resultfolder, 'flow-mean-histogram-inside', removebrackets(groupname));
+    mkdir(outputFolder);
     h = figure(1);
     polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceColor', [1, 1, 1]./3, 'FaceAlpha', 0.3);
     rlim([0, 0.08])
@@ -444,6 +459,8 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
     close(h);
     
     % Binary histogram plot.
+    outputFolder = fullfile(resultfolder, 'flow-mean-histogram-inside-binary', removebrackets(groupname));
+    mkdir(outputFolder);
     h = figure(1);
     polarhistogram(theta(idx), 'BinEdges', [-pi/2, pi/2, 3*pi/2], 'Normalization', 'probability', 'FaceColor', [1, 1, 1]./3, 'FaceAlpha', 0.3);
     %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
@@ -452,6 +469,8 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
     close(h);
     
     % Group histogram plot.
+    outputFolder = fullfile(resultfolder, 'flow-mean-histogram-inside-group', removebrackets(groupname));
+    mkdir(outputFolder);
     h = figure(1);
     polarhistogram(theta(idx), 'BinEdges', [-pi/2, -pi/6, pi/6, pi/2, 9*pi/6], 'Normalization', 'probability', 'FaceColor', [1, 1, 1]./3, 'FaceAlpha', 0.3);
     %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
@@ -460,6 +479,8 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
     close(h);
 
     % Colour-coding of mean velocities.
+    outputFolder = fullfile(resultfolder, 'flow-mean-inside', removebrackets(groupname));
+    mkdir(outputFolder);
     h = figure(1);
     imagesc(flowToColorV2(cat(3, meanv1 .* seg, meanv2 .* seg)));
     daspect([1, 1, 1]);
@@ -473,6 +494,8 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
     [thetam, rhom] = cart2pol(mean(meanv1(idx)), -mean(meanv2(idx)));
     
     % Scatter plot.
+    outputFolder = fullfile(resultfolder, 'flow-mean-scatter-inside', removebrackets(groupname));
+    mkdir(outputFolder);
     h = figure(1);
     polarscatter(theta(idx), rho(idx), 10, [1, 1, 1]./3, '.');
     hold on;
@@ -483,6 +506,8 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
     close(h);
     
     % Histogram of magnitudes.
+    outputFolder = fullfile(resultfolder, 'flow-mean-histogram-magnitude-inside', removebrackets(groupname));
+    mkdir(outputFolder);
     h = figure(1);
     histogram(rho);
     adjustfigure();
