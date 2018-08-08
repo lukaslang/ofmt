@@ -14,9 +14,23 @@
 %
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
-function p = datapath
-%DATAPATH Returns the path where the data is stored.
+function tests = meanangleTest
+    tests = functiontests(localfunctions);
+end
 
-%p = fullfile('/Users/lukaslang/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017/');
-%p = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017-split/');
-p = fullfile('/Users/lukaslang/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017-split/');
+function setupOnce(testCase)
+    cd('../');
+end
+
+function teardownOnce(testCase)
+    cd('test');
+end
+
+function resultTest(testCase)
+
+angles = [pi/2, -pi/2]';
+
+mangle = meanangle(angles);
+verifyEqual(testCase, mangle, 0, 'AbsTol', 1e-12);
+
+end

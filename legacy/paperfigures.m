@@ -92,15 +92,71 @@ for k=1:length(groups)
         [theta, rho] = cart2pol(meanv1, -meanv2);
 
         % Find vectors inside segmentation and where length is larger than epsilon.
-        idx = seg{l} > 0 & abs(rho) >= 1e-3;
+        idx = seg{l} > 0; % & abs(rho) >= 1e-3;
         
         hg = polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
+        rlim([0, 0.08])
         %hg.DisplayStyle = 'stairs';
         %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
         hold on;
     end
     adjustfigure();
     export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+    
+    % Binary polar histogram.
+    h = figure(1);
+    for l=1:length(ds)
+        % Compute average velocities within segmentation.
+        meanv1 = mean(v1{l}, 3);
+        meanv2 = mean(v2{l}, 3);
+
+        % Convert to polar coordinates.
+        [theta, rho] = cart2pol(meanv1, -meanv2);
+
+        % Find vectors inside segmentation and where length is larger than epsilon.
+        idx = seg{l} > 0; % & abs(rho) >= 1e-3;
+        
+        hg = polarhistogram(theta(idx), 'BinEdges', [-pi/2, pi/2, 3*pi/2], 'Normalization', 'probability', 'FaceAlpha', 0.3);
+        %hg.DisplayStyle = 'stairs';
+        %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
+        hold on;
+    end
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside-binary.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+    
+    % Group polar histogram.
+    perc = zeros(length(ds), 4);
+    h = figure(1);
+    for l=1:length(ds)
+        % Compute average velocities within segmentation.
+        meanv1 = mean(v1{l}, 3);
+        meanv2 = mean(v2{l}, 3);
+
+        % Convert to polar coordinates.
+        [theta, rho] = cart2pol(meanv1, -meanv2);
+
+        % Find vectors inside segmentation and where length is larger than epsilon.
+        idx = seg{l} > 0; % & abs(rho) >= 1e-3;
+        
+        hg = polarhistogram(theta(idx), 'BinEdges', [-pi/2, -pi/6, pi/6, pi/2, 9*pi/6], 'Normalization', 'probability', 'FaceAlpha', 0.3);
+        hold on;
+        
+        % Save data.
+        perc(l, :) = hg.Values;
+    end
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside-group.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+    
+    % Group boxplot.
+    h = figure(1);
+    boxplot(perc, 'Labels', {'270-330', '330-30', '30-90', '90-270'});
+    xlabel('Region in degrees');
+    ylabel('Frequency');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside-boxplot.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
     close(h);
     
     % Average velocity plot.
@@ -110,11 +166,11 @@ for k=1:length(groups)
         meanv1 = mean(v1{l}, 3);
         meanv2 = mean(v2{l}, 3);
 
+        % Find vectors inside segmentation.
+        idx = seg{l} > 0;        
+        
         % Convert to polar coordinates.
         [thetam, rhom] = cart2pol(mean(meanv1(idx)), -mean(meanv2(idx)));
-
-        % Find vectors inside segmentation and where length is larger than epsilon.
-        idx = seg{l} > 0 & abs(rho) >= 1e-3;
         
         polarplot([0, thetam], [0, rhom], '-');
         %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
@@ -123,6 +179,31 @@ for k=1:length(groups)
     adjustfigure();
     export_fig(h, fullfile(outputFolder, sprintf('%s-mean-velocities-inside.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
     close(h);
+    
+    % Mean angle plot.
+    h = figure(1);
+    for l=1:length(ds)
+        % Compute average velocities within segmentation.
+        meanv1 = mean(v1{l}, 3);
+        meanv2 = mean(v2{l}, 3);
+
+        % Convert to polar coordinates.
+        [theta, rho] = cart2pol(meanv1, -meanv2);
+        
+        % Find vectors inside segmentation and where length is larger than epsilon.
+        idx = seg{l} > 0; % & abs(rho) >= 1e-3;
+        
+        % Compute mean angle.
+        mangle = meanangle(theta(idx));
+        
+        polarplot([0, mangle], [0, 1], '-');
+        %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
+        hold on;
+    end
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-mean-angles-inside.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+    
 end
 
 %%
@@ -135,7 +216,7 @@ groups = y([y.isdir]);
 fprintf('Starting analysis of folder: %s\n', datapath);
 fprintf('Found %i groups.\n', length(groups));
 
-% Combined analysis.
+% Individual analysis.
 for k=1:length(groups)
     groupname = groups(k).name;
     groupfolder = fullfile(datapath, groupname);
@@ -258,6 +339,30 @@ while(exist(fullfile(groupfolder, sprintf('%s_%d', dataset, l)), 'dir'))
     l = l + 1;
 end
 
+% Set pixel size.
+keySet = {'02_006', '02_009', '02_011', '02_013', '04_002', '04_004', '04_010', '04_015',...
+          '16_005', '16_009', '17_010', '17_014', '17_025', '17_028', '17_031', '17_034', '17_040',...
+          '01_011', '04_005', '04_007', '04_011', '06_005', '06_009', '06_012', '06_015', '06_022',...
+          '09_014', '09_022', '09_024',...
+          '10_020', '10_023', '11_031', '11_036', '05_004', '05_003', '05_005', '05_008', '05_020',...
+          '10_013', '10_017', '10_027', '11_004', '11_018', '14_007', '01_015', '01_017', '01_021', '01_023',...
+          '12_014', '12_018', '12_022', '12_029', '12_033', '12_037', '13_008', '13_012', '13_018', '13_022'};
+valueSet = [0.303, 0.217, 0.23, 0.303, 0.188, 0.257, 0.269, 0.298,...
+            0.223, 0.168, 0.24, 1, 0.303, 0.284, 0.303, 0.286, 0.225,...
+            0.217, 0.257, 0.257, 0.269, 0.281, 0.283, 0.265, 0.265, 0.228,...
+            0.214, 0.255, 0.255,...
+            0.335, 0.412, 0.378, 0.227, 0.22, 0.276, 0.304, 0.28, 0.304,...
+            0.265, 0.335, 0.381, 0.374, 0.289, 0.37, 0.303, 0.304, 0.248, 0.244,...
+            0.39, 0.297, 0.297, 0.434, 1, 0.307, 0.324, 0.299, 0.299, 0.299];
+pixelSize = containers.Map(keySet,valueSet);
+
+% Set interval between frames (seconds).
+interval = 0.65;
+
+% Scale velocities according to pixel size.
+v1 = v1 * pixelSize(dataset) / interval;
+v2 = v2 * pixelSize(dataset) / interval;
+
 end
 
 function createplots(outputFolder, dataset, v1, v2, seg, f, u)
@@ -327,14 +432,31 @@ function createplots(outputFolder, dataset, v1, v2, seg, f, u)
     [theta, rho] = cart2pol(meanv1, -meanv2);
     
     % Find vectors inside segmentation and where length is larger than epsilon.
-    idx = seg > 0 & abs(rho) >= 1e-3;
+    idx = seg > 0; % & abs(rho) >= 1e-3;
 
     % Histogram plot.
     h = figure(1);
     polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceColor', [1, 1, 1]./3, 'FaceAlpha', 0.3);
+    rlim([0, 0.08])
     %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
     adjustfigure();
     export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-histogram-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+    
+    % Binary histogram plot.
+    h = figure(1);
+    polarhistogram(theta(idx), 'BinEdges', [-pi/2, pi/2, 3*pi/2], 'Normalization', 'probability', 'FaceColor', [1, 1, 1]./3, 'FaceAlpha', 0.3);
+    %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-histogram-inside-binary.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+    
+    % Group histogram plot.
+    h = figure(1);
+    polarhistogram(theta(idx), 'BinEdges', [-pi/2, -pi/6, pi/6, pi/2, 9*pi/6], 'Normalization', 'probability', 'FaceColor', [1, 1, 1]./3, 'FaceAlpha', 0.3);
+    %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-histogram-inside-group.png', dataset)), '-png', '-q100', '-a1', '-transparent');
     close(h);
 
     % Colour-coding of mean velocities.

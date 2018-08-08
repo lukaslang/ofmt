@@ -14,9 +14,20 @@
 %
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
-function p = datapath
-%DATAPATH Returns the path where the data is stored.
+function m = meanangle(v)
+%MEANANGLE Computes the circular mean angle.
+%
+%   m = MEANANGLE(v) takes a vector of angles in the interval
+%   [0, 360] and returns the mean circular angle m according to
+%
+%   https://en.wikipedia.org/wiki/Mean_of_circular_quantities
+%
+%   See https://rosettacode.org/wiki/Averages/Mean_angle#MATLAB_.2F_Octave
+%
+%   v is a vector of size [n, 1].
+%
+%   m is a scalar in [0, 360).
 
-%p = fullfile('/Users/lukaslang/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017/');
-%p = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017-split/');
-p = fullfile('/Users/lukaslang/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017-split/');
+m = angle(mean(exp(1i * v)));
+
+end
