@@ -23,6 +23,9 @@ clc;
 % Set result folder.
 resultfolder = fullfile('results', 'figures');
 
+% Flag to skip group analysis.
+groupanalysis = true;
+
 %% Plot first dataset for each group.
 
 % Add all subfolders.
@@ -59,165 +62,189 @@ end
 
 %% Plot polar histogram for each group.
 
-% Create output folder.
-outputFolder = fullfile(resultfolder);
-mkdir(outputFolder);
+if(groupanalysis)
 
-% Add all subfolders.
-y = dir(datapath);
-y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
-groups = y([y.isdir]);
-
-fprintf('Starting analysis of folder: %s\n', datapath);
-fprintf('Found %i groups.\n', length(groups));
-
-% Combined analysis.
-for k=1:length(groups)
-    groupname = groups(k).name;
-    groupfolder = fullfile(datapath, groupname);
-    
-    fprintf('Group: %s\n', groupfolder);
-    
-    % Run analysis.
-    [ds, v1, v2, seg, f, u] = loaddatasets(groupname, groupfolder, resultfolder);
-    
-    % Histogram plot.
-    outputFolder = fullfile(resultfolder, 'mean-histogram-inside');
+    % Create output folder.
+    outputFolder = fullfile(resultfolder);
     mkdir(outputFolder);
-    h = figure(1);
-    for l=1:length(ds)
-        % Compute average velocities within segmentation.
-        meanv1 = mean(v1{l}, 3);
-        meanv2 = mean(v2{l}, 3);
 
-        % Convert to polar coordinates.
-        [theta, rho] = cart2pol(meanv1, -meanv2);
+    % Add all subfolders.
+    y = dir(datapath);
+    y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
+    groups = y([y.isdir]);
 
-        % Find vectors inside segmentation and where length is larger than epsilon.
-        idx = seg{l} > 0; % & abs(rho) >= 1e-3;
-        
-        hg = polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
-        rlim([0, 0.08])
-        %hg.DisplayStyle = 'stairs';
-        %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
-        hold on;
+    fprintf('Starting analysis of folder: %s\n', datapath);
+    fprintf('Found %i groups.\n', length(groups));
+
+    % Combined analysis.
+    for k=1:length(groups)
+        groupname = groups(k).name;
+        groupfolder = fullfile(datapath, groupname);
+
+        fprintf('Group: %s\n', groupfolder);
+
+        % Run analysis.
+        [ds, v1, v2, seg, f, u] = loaddatasets(groupname, groupfolder, resultfolder);
+
+        % Histogram plot.
+        outputFolder = fullfile(resultfolder, 'mean-histogram-inside');
+        mkdir(outputFolder);
+        h = figure(1);
+        for l=1:length(ds)
+            % Compute average velocities within segmentation.
+            meanv1 = mean(v1{l}, 3);
+            meanv2 = mean(v2{l}, 3);
+
+            % Convert to polar coordinates.
+            [theta, rho] = cart2pol(meanv1, -meanv2);
+
+            % Find vectors inside segmentation and where length is larger than epsilon.
+            idx = seg{l} > 0; % & abs(rho) >= 1e-3;
+
+            hg = polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
+            rlim([0, 0.08])
+            %hg.DisplayStyle = 'stairs';
+            %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
+            hold on;
+        end
+        adjustfigure();
+        export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+        close(h);
+
+        % Binary polar histogram.
+        outputFolder = fullfile(resultfolder, 'mean-histogram-inside-binary');
+        mkdir(outputFolder);
+        h = figure(1);
+        for l=1:length(ds)
+            % Compute average velocities within segmentation.
+            meanv1 = mean(v1{l}, 3);
+            meanv2 = mean(v2{l}, 3);
+
+            % Convert to polar coordinates.
+            [theta, rho] = cart2pol(meanv1, -meanv2);
+
+            % Find vectors inside segmentation and where length is larger than epsilon.
+            idx = seg{l} > 0; % & abs(rho) >= 1e-3;
+
+            hg = polarhistogram(theta(idx), 'BinEdges', [-pi/2, pi/2, 3*pi/2], 'Normalization', 'probability', 'FaceAlpha', 0.3);
+            %hg.DisplayStyle = 'stairs';
+            %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
+            hold on;
+        end
+        adjustfigure();
+        export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside-binary.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+        close(h);
+
+        % Group polar histogram.
+        outputFolder = fullfile(resultfolder, 'mean-histogram-inside-group');
+        mkdir(outputFolder);
+        perc = zeros(length(ds), 4);
+        h = figure(1);
+        for l=1:length(ds)
+            % Compute average velocities within segmentation.
+            meanv1 = mean(v1{l}, 3);
+            meanv2 = mean(v2{l}, 3);
+
+            % Convert to polar coordinates.
+            [theta, rho] = cart2pol(meanv1, -meanv2);
+
+            % Find vectors inside segmentation and where length is larger than epsilon.
+            idx = seg{l} > 0; % & abs(rho) >= 1e-3;
+
+            hg = polarhistogram(theta(idx), 'BinEdges', [-pi/2, -pi/6, pi/6, pi/2, 9*pi/6], 'Normalization', 'probability', 'FaceAlpha', 0.3);
+            hold on;
+
+            % Save data.
+            perc(l, :) = hg.Values;
+        end
+        adjustfigure();
+        export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside-group.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+        close(h);
+
+        % Group boxplot.
+        outputFolder = fullfile(resultfolder, 'mean-histogram-inside-boxplot');
+        mkdir(outputFolder);
+        h = figure(1);
+        boxplot(perc, 'Labels', {'270-330', '330-30', '30-90', '90-270'});
+        xlabel('Region in degrees');
+        ylabel('Frequency');
+        adjustfigure();
+        export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside-boxplot.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+        close(h);
+
+        % Average velocity plot.
+        outputFolder = fullfile(resultfolder, 'mean-velocities-inside');
+        mkdir(outputFolder);
+        h = figure(1);
+        for l=1:length(ds)
+            % Compute average velocities within segmentation.
+            meanv1 = mean(v1{l}, 3);
+            meanv2 = mean(v2{l}, 3);
+
+            % Find vectors inside segmentation.
+            idx = seg{l} > 0;        
+
+            % Convert to polar coordinates.
+            [thetam, rhom] = cart2pol(mean(meanv1(idx)), -mean(meanv2(idx)));
+
+            polarplot([0, thetam], [0, rhom], '-');
+            %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
+            hold on;
+        end
+        adjustfigure();
+        export_fig(h, fullfile(outputFolder, sprintf('%s-mean-velocities-inside.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+        close(h);
+
+        % Mean angle plot.
+        outputFolder = fullfile(resultfolder, 'mean-angles-inside');
+        mkdir(outputFolder);
+        h = figure(1);
+        for l=1:length(ds)
+            % Compute average velocities within segmentation.
+            meanv1 = mean(v1{l}, 3);
+            meanv2 = mean(v2{l}, 3);
+
+            % Convert to polar coordinates.
+            [theta, rho] = cart2pol(meanv1, -meanv2);
+
+            % Find vectors inside segmentation and where length is larger than epsilon.
+            idx = seg{l} > 0; % & abs(rho) >= 1e-3;
+
+            % Compute mean angle.
+            mangle = meanangle(theta(idx));
+
+            polarplot([0, mangle], [0, 1], '-');
+            %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
+            hold on;
+        end
+        adjustfigure();
+        export_fig(h, fullfile(outputFolder, sprintf('%s-mean-angles-inside.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+        close(h);
+
+        % Mean velocity magnitudes boxplot.
+        outputFolder = fullfile(resultfolder, 'mean-velocities-inside-boxplot');
+        mkdir(outputFolder);
+        rho = zeros(length(ds), 1);
+        for l=1:length(ds)
+            % Compute average velocities within segmentation.
+            meanv1 = mean(v1{l}, 3);
+            meanv2 = mean(v2{l}, 3);
+
+            % Find vectors inside segmentation.
+            idx = seg{l} > 0;        
+
+            % Convert to polar coordinates.
+            [~, rho(l)] = cart2pol(mean(meanv1(idx)), -mean(meanv2(idx)));
+        end
+        h = figure(1);
+        boxplot(rho, 'Labels', {groupname});
+        ylabel('$\mu$m/second', 'Interpreter', 'latex');
+        title('Mean velocity.', 'Interpreter', 'latex');
+        adjustfigure();
+        export_fig(h, fullfile(outputFolder, sprintf('%s-mean-velocities-inside-boxplot.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+        close(h);
     end
-    adjustfigure();
-    export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-    close(h);
-    
-    % Binary polar histogram.
-    outputFolder = fullfile(resultfolder, 'mean-histogram-inside-binary');
-    mkdir(outputFolder);
-    h = figure(1);
-    for l=1:length(ds)
-        % Compute average velocities within segmentation.
-        meanv1 = mean(v1{l}, 3);
-        meanv2 = mean(v2{l}, 3);
-
-        % Convert to polar coordinates.
-        [theta, rho] = cart2pol(meanv1, -meanv2);
-
-        % Find vectors inside segmentation and where length is larger than epsilon.
-        idx = seg{l} > 0; % & abs(rho) >= 1e-3;
-        
-        hg = polarhistogram(theta(idx), 'BinEdges', [-pi/2, pi/2, 3*pi/2], 'Normalization', 'probability', 'FaceAlpha', 0.3);
-        %hg.DisplayStyle = 'stairs';
-        %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
-        hold on;
-    end
-    adjustfigure();
-    export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside-binary.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-    close(h);
-    
-    % Group polar histogram.
-    outputFolder = fullfile(resultfolder, 'mean-histogram-inside-group');
-    mkdir(outputFolder);
-    perc = zeros(length(ds), 4);
-    h = figure(1);
-    for l=1:length(ds)
-        % Compute average velocities within segmentation.
-        meanv1 = mean(v1{l}, 3);
-        meanv2 = mean(v2{l}, 3);
-
-        % Convert to polar coordinates.
-        [theta, rho] = cart2pol(meanv1, -meanv2);
-
-        % Find vectors inside segmentation and where length is larger than epsilon.
-        idx = seg{l} > 0; % & abs(rho) >= 1e-3;
-        
-        hg = polarhistogram(theta(idx), 'BinEdges', [-pi/2, -pi/6, pi/6, pi/2, 9*pi/6], 'Normalization', 'probability', 'FaceAlpha', 0.3);
-        hold on;
-        
-        % Save data.
-        perc(l, :) = hg.Values;
-    end
-    adjustfigure();
-    export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside-group.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-    close(h);
-    
-    % Group boxplot.
-    outputFolder = fullfile(resultfolder, 'mean-histogram-inside-boxplot');
-    mkdir(outputFolder);
-    h = figure(1);
-    boxplot(perc, 'Labels', {'270-330', '330-30', '30-90', '90-270'});
-    xlabel('Region in degrees');
-    ylabel('Frequency');
-    adjustfigure();
-    export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside-boxplot.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-    close(h);
-    
-    % Average velocity plot.
-    outputFolder = fullfile(resultfolder, 'mean-velocities-inside');
-    mkdir(outputFolder);
-    h = figure(1);
-    for l=1:length(ds)
-        % Compute average velocities within segmentation.
-        meanv1 = mean(v1{l}, 3);
-        meanv2 = mean(v2{l}, 3);
-
-        % Find vectors inside segmentation.
-        idx = seg{l} > 0;        
-        
-        % Convert to polar coordinates.
-        [thetam, rhom] = cart2pol(mean(meanv1(idx)), -mean(meanv2(idx)));
-        
-        polarplot([0, thetam], [0, rhom], '-');
-        %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
-        hold on;
-    end
-    adjustfigure();
-    export_fig(h, fullfile(outputFolder, sprintf('%s-mean-velocities-inside.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-    close(h);
-    
-    % Mean angle plot.
-    outputFolder = fullfile(resultfolder, 'mean-angles-inside');
-    mkdir(outputFolder);
-    h = figure(1);
-    for l=1:length(ds)
-        % Compute average velocities within segmentation.
-        meanv1 = mean(v1{l}, 3);
-        meanv2 = mean(v2{l}, 3);
-
-        % Convert to polar coordinates.
-        [theta, rho] = cart2pol(meanv1, -meanv2);
-        
-        % Find vectors inside segmentation and where length is larger than epsilon.
-        idx = seg{l} > 0; % & abs(rho) >= 1e-3;
-        
-        % Compute mean angle.
-        mangle = meanangle(theta(idx));
-        
-        polarplot([0, mangle], [0, 1], '-');
-        %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
-        hold on;
-    end
-    adjustfigure();
-    export_fig(h, fullfile(outputFolder, sprintf('%s-mean-angles-inside.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-    close(h);
-    
 end
-
 %%
 
 % Add all subfolders.
@@ -509,9 +536,35 @@ function createplots(resultfolder, groupname, dataset, v1, v2, seg, f, u)
     outputFolder = fullfile(resultfolder, 'flow-mean-histogram-magnitude-inside', removebrackets(groupname));
     mkdir(outputFolder);
     h = figure(1);
-    histogram(rho);
+    histogram(rho(idx));
     adjustfigure();
     export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-histogram-magnitude-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+    
+    % Boxplot of magnitudes.
+    outputFolder = fullfile(resultfolder, 'flow-mean-magnitude-inside-boxplot', removebrackets(groupname));
+    mkdir(outputFolder);
+    h = figure(1);
+    boxplot(rho(idx), 'Labels', {dataset});
+    ylabel('$\mu$m/second', 'Interpreter', 'latex');
+    title('Mean magnitude of velocity.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-magnitude-inside-boxplot.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+    
+    % Boxplot of magnitudes.
+    outputFolder = fullfile(resultfolder, 'flow-magnitude-inside-boxplot', removebrackets(groupname));
+    mkdir(outputFolder);
+    
+    % Convert to polar coordinates.
+    [~, rho] = cart2pol(v1(:), -v2(:));
+
+    h = figure(1);
+    boxplot(rho(idx), 'Labels', {dataset});
+    ylabel('$\mu$m/second', 'Interpreter', 'latex');
+    title('Magnitude of velocity.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-flow-magnitude-inside-boxplot.png', dataset)), '-png', '-q100', '-a1', '-transparent');
     close(h);
 end
 
