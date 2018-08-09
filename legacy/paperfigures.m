@@ -26,6 +26,18 @@ resultfolder = fullfile('results', 'figures');
 % Flag to skip group analysis.
 groupanalysis = true;
 
+% Flag for individual analysis.
+individualanalysis = true;
+
+% Flag for region analysis.
+regionanalysis = true;
+
+% Define regions by rectangle.
+rectX = 150;
+rectY = 50;
+width = 50;
+height = 200;
+
 %% Plot first dataset for each group.
 
 % Add all subfolders.
@@ -84,7 +96,7 @@ if(groupanalysis)
         fprintf('Group: %s\n', groupfolder);
 
         % Run analysis.
-        [ds, v1, v2, seg, f, u] = loaddatasets(groupname, groupfolder, resultfolder);
+        [ds, v1, v2, seg, f, u] = loaddatasets(groupfolder);
 
         % Histogram plot.
         outputFolder = fullfile(resultfolder, 'mean-histogram-inside');
@@ -109,6 +121,87 @@ if(groupanalysis)
         end
         adjustfigure();
         export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+        close(h);
+        
+        % Histogram plot for region one.
+        region = false(size(seg{l}));
+        region(rectX:rectX+height, rectY:rectY+width) = true;
+        outputFolder = fullfile(resultfolder, 'mean-histogram-inside-region-1');
+        mkdir(outputFolder);
+        h = figure(1);
+        for l=1:length(ds)
+            % Compute average velocities within segmentation.
+            meanv1 = mean(v1{l}, 3);
+            meanv2 = mean(v2{l}, 3);
+
+            % Convert to polar coordinates.
+            [theta, rho] = cart2pol(meanv1, -meanv2);
+
+            % Find vectors inside segmentation and region.
+            idx = seg{l} > 0 & region;
+
+            hg = polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
+            rlim([0, 0.08])
+            %hg.DisplayStyle = 'stairs';
+            %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
+            hold on;
+        end
+        adjustfigure();
+        export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside-region-1.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+        close(h);
+
+        % Histogram plot for region two.
+        region = false(size(seg{l}));
+        region(rectX:rectX+height, rectY+width+1:rectY+2*width+1) = true;
+        outputFolder = fullfile(resultfolder, 'mean-histogram-inside-region-2');
+        mkdir(outputFolder);
+        h = figure(1);
+        for l=1:length(ds)
+            % Compute average velocities within segmentation.
+            meanv1 = mean(v1{l}, 3);
+            meanv2 = mean(v2{l}, 3);
+
+            % Convert to polar coordinates.
+            [theta, rho] = cart2pol(meanv1, -meanv2);
+
+            % Find vectors inside segmentation and region.
+            idx = seg{l} > 0 & region;
+
+            hg = polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
+            rlim([0, 0.08])
+            %hg.DisplayStyle = 'stairs';
+            %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
+            hold on;
+        end
+        adjustfigure();
+        export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside-region-2.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+        close(h);
+        
+        % Histogram plot for region three.
+        region = false(size(seg{l}));
+        region(rectX:rectX+height, rectY+2*width+1:rectY+3*width+1) = true;
+        outputFolder = fullfile(resultfolder, 'mean-histogram-inside-region-3');
+        mkdir(outputFolder);
+        h = figure(1);
+        for l=1:length(ds)
+            % Compute average velocities within segmentation.
+            meanv1 = mean(v1{l}, 3);
+            meanv2 = mean(v2{l}, 3);
+
+            % Convert to polar coordinates.
+            [theta, rho] = cart2pol(meanv1, -meanv2);
+
+            % Find vectors inside segmentation and region.
+            idx = seg{l} > 0 & region;
+
+            hg = polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
+            rlim([0, 0.08])
+            %hg.DisplayStyle = 'stairs';
+            %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
+            hold on;
+        end
+        adjustfigure();
+        export_fig(h, fullfile(outputFolder, sprintf('%s-mean-histogram-inside-region-3.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
         close(h);
 
         % Binary polar histogram.
@@ -247,66 +340,72 @@ if(groupanalysis)
 end
 %%
 
-% Add all subfolders.
-y = dir(datapath);
-y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
-groups = y([y.isdir]);
+if(individualanalysis)
+    % Add all subfolders.
+    y = dir(datapath);
+    y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
+    groups = y([y.isdir]);
 
-fprintf('Starting analysis of folder: %s\n', datapath);
-fprintf('Found %i groups.\n', length(groups));
+    fprintf('Starting analysis of folder: %s\n', datapath);
+    fprintf('Found %i groups.\n', length(groups));
 
-% Individual analysis.
-for k=1:length(groups)
-    groupname = groups(k).name;
-    groupfolder = fullfile(datapath, groupname);
-    
-    fprintf('Group: %s\n', groupfolder);
-    
-    % Run analysis.
-    [ds, v1, v2, seg, f, u] = loaddatasets(groupname, groupfolder, resultfolder);
+    % Individual analysis.
+    for k=1:length(groups)
+        groupname = groups(k).name;
+        groupfolder = fullfile(datapath, groupname);
 
-    % Run through datasets.
-    for l=1:length(ds)
-        % Create plots.
-        createplots(resultfolder, groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
+        fprintf('Group: %s\n', groupfolder);
+
+        % Run analysis.
+        [ds, v1, v2, seg, f, u] = loaddatasets(groupfolder);
+
+        % Run through datasets.
+        for l=1:length(ds)
+            % Create plots.
+            createplots(resultfolder, groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
+        end
     end
 end
 
-
 %% Analyse regions.
 
-% % Add all subfolders.
-% y = dir(datapath);
-% y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
-% groups = y([y.isdir]);
-% 
-% fprintf('Starting analysis of folder: %s\n', datapath);
-% fprintf('Found %i groups.\n', length(groups));
-% 
-% % Define regions.
-% keySet = {'01_control', '02_capu_EY12344_'};
-% valueSet = {};
-% R = containers.Map(keySet, valueSet);
-% 
-% for k=1:length(groups)
-%     groupname = groups(k).name;
-%     groupfolder = fullfile(datapath, groupname);
-%     
-%     fprintf('Group: %s\n', groupfolder);
-%     
-%     % Run analysis.
-%     [ds, v1, v2, seg, f, u] = loaddatasets(groupname, groupfolder, resultfolder);
-% 
-%     % Run through datasets.
-%     for l=1:length(ds)
-%         % Create output folder.
-%         outputFolder = fullfile(resultfolder, removebrackets(groupname), ds{l});
-%         mkdir(outputFolder);
-%         % Create plots.
-%         createplots(outputFolder, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
-%     end
-% end
+if(regionanalysis)
 
+    % Add all subfolders.
+    y = dir(datapath);
+    y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
+    groups = y([y.isdir]);
+
+    fprintf('Starting analysis of folder: %s\n', datapath);
+    fprintf('Found %i groups.\n', length(groups));
+
+    % Individual analysis.
+    for k=1:length(groups)
+        groupname = groups(k).name;
+        groupfolder = fullfile(datapath, groupname);
+
+        fprintf('Group: %s\n', groupfolder);
+
+        % Run analysis.
+        [ds, v1, v2, seg, f, u] = loaddatasets(groupfolder);
+
+        % Run through datasets.
+        for l=1:length(ds)
+            % Create plots for region one.
+            region = false(size(seg{l}));
+            region(rectX:rectX+height, rectY:rectY+width) = true;
+            createplots(fullfile(resultfolder, 'region-1'), groupname, ds{l}, v1{l}, v2{l}, seg{l} & region, f{l}, u{l});
+            % Create plots for region one.
+            region = false(size(seg{l}));
+            region(rectX:rectX+height, rectY+width+1:rectY+2*width+1) = true;
+            createplots(fullfile(resultfolder, 'region-2'), groupname, ds{l}, v1{l}, v2{l}, seg{l} & region, f{l}, u{l});
+            % Create plots for region one.
+            region = false(size(seg{l}));
+            region(rectX:rectX+height, rectY+2*width+1:rectY+3*width+1) = true;
+            createplots(fullfile(resultfolder, 'region-3'), groupname, ds{l}, v1{l}, v2{l}, seg{l} & region, f{l}, u{l});
+        end
+    end
+end
 %%
 
 function str = removebrackets(str)
@@ -315,7 +414,7 @@ str = regexprep(regexprep(str, '[', '_'), ']', '_');
 
 end
 
-function [ds, v1, v2, seg, f, u] = loaddatasets(groupname, groupfolder, outputfolder)
+function [ds, v1, v2, seg, f, u] = loaddatasets(groupfolder)
 %LOADDATASET Groups split sequences to datasets in one group.
 
 % Load datasets.
@@ -390,6 +489,8 @@ valueSet = [0.303, 0.217, 0.23, 0.303, 0.188, 0.257, 0.269, 0.298,...
             0.335, 0.412, 0.378, 0.227, 0.22, 0.276, 0.304, 0.28, 0.304,...
             0.265, 0.335, 0.381, 0.374, 0.289, 0.37, 0.303, 0.304, 0.248, 0.244,...
             0.39, 0.297, 0.297, 0.434, 1, 0.307, 0.324, 0.299, 0.299, 0.299];
+% Sanity check and create map.
+assert(length(keySet) == length(unique(keySet)));
 pixelSize = containers.Map(keySet,valueSet);
 
 % Set interval between frames (seconds).
