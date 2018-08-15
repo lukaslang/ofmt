@@ -5,10 +5,10 @@ close all;
 clc;
 
 % Folder name.
-datafolder = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data July 2018/');
+datafolder = fullfile('/home/ll542/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017/');
 
 % Output folder.
-outputfolder = fullfile('/home/ll542/store/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data July 2018-split/');
+outputfolder = fullfile('/home/ll542/Dropbox (Cambridge University)/Maik and Hendrik and Carola shared/Data November 2017-split/');
 
 % Sequence length.
 maxlength = 50;
@@ -57,6 +57,12 @@ for k=1:length(groupfolders)
             % Copy segmentation.
             mkdir(fullfile(targetfolder, 'images'));
             copyfile(fullfile(datasetfolder, 'images', 'segmentationMap.png'), fullfile(targetfolder, 'images', 'segmentationMap.png'));
+            
+            % Copy region maps if present.
+            if(isfile(fullfile(datasetfolder, 'images', 'segmentationMap1.png')) && isfile(fullfile(datasetfolder, 'images', 'segmentationMap2.png')))
+                copyfile(fullfile(datasetfolder, 'images', 'segmentationMap1.png'), fullfile(targetfolder, 'images', 'segmentationMap1.png'));
+                copyfile(fullfile(datasetfolder, 'images', 'segmentationMap2.png'), fullfile(targetfolder, 'images', 'segmentationMap2.png'));
+            end
         end
     end
 end
