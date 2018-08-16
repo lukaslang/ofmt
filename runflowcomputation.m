@@ -73,7 +73,7 @@ end
 function checkSegmentationMap(groups)
 % CHECKSEGMENTATIONMAP Runs a quick check if for every dataset a
 % segmentation exists. Fails with error.
-	for k=1:length(groups)
+    for k=1:length(groups)
         groupname = groups(k).name;
         % Run through all datasets.
         y = dir(fullfile(datapath, groupname));
