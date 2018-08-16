@@ -30,553 +30,51 @@ groupanalysis = true;
 regionanalysis = true;
 
 % Flag for individual analysis.
-individualanalysis = false;
-
-% Set epsilon for polar histograms.
-epsilon = 1e-3;
+individualanalysis = true;
 
 %% Create aggregated plots for each group.
 
-if(groupanalysis)
-    % Create output folder.
-    outputFolder = fullfile(resultfolder);
-    mkdir(outputFolder);
+% Create output folder.
+outputFolder = fullfile(resultfolder);
+mkdir(outputFolder);
 
-    % Add all subfolders.
-    y = dir(datapath);
-    y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
-    groups = y([y.isdir]);
+% Add all subfolders.
+y = dir(datapath);
+y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
+groups = y([y.isdir]);
 
-    fprintf('Starting analysis of folder: %s\n', datapath);
-    fprintf('Found %i groups.\n', length(groups));
+fprintf('Starting analysis of folder: %s\n', datapath);
+fprintf('Found %i groups.\n', length(groups));
 
-    % Combined analysis.
-    for k=1:length(groups)
-        groupname = groups(k).name;
-        groupfolder = fullfile(datapath, groupname);
+% Combined analysis.
+for k=1:length(groups)
+    groupname = groups(k).name;
+    groupfolder = fullfile(datapath, groupname);
 
-        fprintf('Group: %s\n', groupfolder);
+    fprintf('Group: %s\n', groupfolder);
 
-        % Run analysis.
-        [ds, v1, v2, seg, seg1, seg2, f, u] = loaddatasets(groupfolder);
-        
-        % Polar histogram of all angles.
-        outputFolder = fullfile(resultfolder, 'polarhistogram-direction-all');
-        mkdir(outputFolder);
-        h = figure(1);
-        for l=1:length(ds)
-            % Convert to polar coordinates.
-            [theta, rho] = cart2pol(v1{l}, -v2{l});
+    % Run analysis.
+    [ds, v1, v2, seg, seg1, seg2, f, u] = loaddatasets(groupfolder);
 
-            % Replicate segmentation.
-            segt = repmat(seg{l}, 1, 1, size(v1{l}, 3));
-
-            % Find segmentation.
-            idx = segt > 0 & rho > epsilon;
-
-            hg = polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
-            hold on;
-        end
-        rlim([0, 0.08])
-        title('Directions of all velocities.', 'Interpreter', 'latex');
-        adjustfigure();
-        export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-all.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-        close(h);
-
-        % Polar histogram of time-averaged angles.
-        outputFolder = fullfile(resultfolder, 'polarhistogram-direction-time-averaged');
-        mkdir(outputFolder);
-        h = figure(1);
-        for l=1:length(ds)
-            % Compute mean over time.
-            meanv1 = mean(v1{l}, 3);
-            meanv2 = mean(v2{l}, 3);
-            
-            % Convert to polar coordinates.
-            [theta, ~] = cart2pol(meanv1, -meanv2);
-            
-            % Find segmentation.
-            idx = seg{l} > 0;
-
-            hg = polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
-            hold on;
-        end
-        rlim([0, 0.08])
-        title('Directions of time-averaged velocities.', 'Interpreter', 'latex');
-        adjustfigure();
-        export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-time-averaged.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-        close(h);
-
-        % Left-right polar histogram of all angles.
-        outputFolder = fullfile(resultfolder, 'polarhistogram-direction-left-right-all');
-        mkdir(outputFolder);
-        perc = zeros(length(ds), 2);
-        h = figure(1);
-        for l=1:length(ds)
-            % Convert to polar coordinates.
-            [theta, rho] = cart2pol(v1{l}, -v2{l});
-
-            % Replicate segmentation.
-            segt = repmat(seg{l}, 1, 1, size(v1{l}, 3));
-
-            % Find segmentation.
-            idx = segt > 0 & rho > epsilon;
-
-            hg = polarhistogram(theta(idx), 'BinEdges', [pi/2, 3*pi/2, 5*pi/2], 'Normalization', 'probability', 'FaceAlpha', 0.3);
-            perc(l, :) = hg.Values;
-            hold on;
-        end
-        rlim([0, 1])
-        title('Directions of all velocities.', 'Interpreter', 'latex');
-        adjustfigure();
-        export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-left-right-all.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-        close(h);
-        
-        % Create table with left-right polar histogram of all angles.
-        outputFolder = fullfile(resultfolder, 'polarhistogram-direction-left-right-table');
-        mkdir(outputFolder);
-        T = table(perc(:, 1), perc(:, 2), 'VariableNames', {'Left', 'Right'}, 'RowNames', ds);
-        writetable(T, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-left-right.txt', removebrackets(groupname))), 'WriteRowNames', true);
-
-        % Left-right polar histogram of time-averaged angles.
-        outputFolder = fullfile(resultfolder, 'polarhistogram-direction-left-right-time-averaged');
-        mkdir(outputFolder);
-        perc = zeros(length(ds), 2);
-        h = figure(1);
-        for l=1:length(ds)
-            % Compute mean over time.
-            meanv1 = mean(v1{l}, 3);
-            meanv2 = mean(v2{l}, 3);
-            
-            % Convert to polar coordinates.
-            [theta, ~] = cart2pol(meanv1, -meanv2);
-            
-            % Find segmentation.
-            idx = seg{l} > 0;
-
-            hg = polarhistogram(theta(idx), 'BinEdges', [pi/2, 3*pi/2, 5*pi/2], 'Normalization', 'probability', 'FaceAlpha', 0.3);
-            perc(l, :) = hg.Values;
-            hold on;
-        end
-        rlim([0, 1])
-        title('Directions of time-averaged velocities.', 'Interpreter', 'latex');
-        adjustfigure();
-        export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-left-right-time-averaged.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-        close(h);
-        
-        % Create table with left-right polar histogram of time-averaged angles.
-        outputFolder = fullfile(resultfolder, 'polarhistogram-direction-left-right-time-averaged-table');
-        mkdir(outputFolder);
-        T = table(perc(:, 1), perc(:, 2), 'VariableNames', {'Left', 'Right'}, 'RowNames', ds);
-        writetable(T, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-left-right-time-averaged.txt', removebrackets(groupname))), 'WriteRowNames', true);
-
-        % Group polar histogram of all angles.
-        outputFolder = fullfile(resultfolder, 'polarhistogram-direction-group-all');
-        mkdir(outputFolder);
-        perc = zeros(length(ds), 4);
-        h = figure(1);
-        for l=1:length(ds)
-            % Convert to polar coordinates.
-            [theta, rho] = cart2pol(v1{l}, -v2{l});
-
-            % Replicate segmentation.
-            segt = repmat(seg{l}, 1, 1, size(v1{l}, 3));
-
-            % Find segmentation.
-            idx = segt > 0 & rho > epsilon;
-
-            hg = polarhistogram(theta(idx), 'BinEdges', [-pi/2, -pi/6, pi/6, pi/2, 9*pi/6], 'Normalization', 'probability', 'FaceAlpha', 0.3);
-            perc(l, :) = hg.Values;
-            hold on;
-        end
-        rlim([0, 1])
-        title('Directions of all velocities.', 'Interpreter', 'latex');
-        adjustfigure();
-        export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-all.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-        close(h);
-
-        % Create table with group polar histogram of all angles.
-        outputFolder = fullfile(resultfolder, 'polarhistogram-direction-group-all-table');
-        mkdir(outputFolder);
-        T = table(perc(:, 1), perc(:, 2), perc(:, 3), perc(:, 4), 'VariableNames', {'deg270_330', 'deg330_30', 'deg30_90', 'deg90_270'}, 'RowNames', ds);
-        writetable(T, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-all.txt', removebrackets(groupname))), 'WriteRowNames', true);
-        
-        % Group boxplot.
-        outputFolder = fullfile(resultfolder, 'boxplot-direction-group-all');
-        mkdir(outputFolder);
-        h = figure(1);
-        boxplot(perc, 'Labels', {'270-330', '330-30', '30-90', '90-270'});
-        xlabel('Region in degrees');
-        ylabel('Frequency of directions of the velocity for each region');
-        adjustfigure();
-        export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-direction-group-all.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-        close(h);
-        
-        % Group polar histogram of time-averaged angles.
-        outputFolder = fullfile(resultfolder, 'polarhistogram-direction-group-time-averaged');
-        mkdir(outputFolder);
-        perc = zeros(length(ds), 4);
-        h = figure(1);
-        for l=1:length(ds)
-            % Compute mean over time.
-            meanv1 = mean(v1{l}, 3);
-            meanv2 = mean(v2{l}, 3);
-            
-            % Convert to polar coordinates.
-            [theta, ~] = cart2pol(meanv1, -meanv2);
-            
-            % Find segmentation.
-            idx = seg{l} > 0;
-
-            % Plot data.
-            hg = polarhistogram(theta(idx), 'BinEdges', [-pi/2, -pi/6, pi/6, pi/2, 9*pi/6], 'Normalization', 'probability', 'FaceAlpha', 0.3);
-            perc(l, :) = hg.Values;
-            hold on;
-        end
-        rlim([0, 1])
-        title('Directions of time-averaged velocities.', 'Interpreter', 'latex');
-        adjustfigure();
-        export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-time-averaged.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-        close(h);
-
-        % Create table with group polar histogram of time-averaged angles.
-        outputFolder = fullfile(resultfolder, 'polarhistogram-direction-group-time-averaged-table');
-        mkdir(outputFolder);
-        T = table(perc(:, 1), perc(:, 2), perc(:, 3), perc(:, 4), 'VariableNames', {'deg270_330', 'deg330_30', 'deg30_90', 'deg90_270'}, 'RowNames', ds);
-        writetable(T, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-time-averaged.txt', removebrackets(groupname))), 'WriteRowNames', true);
-        
-        % Group boxplot.
-        outputFolder = fullfile(resultfolder, 'boxplot-direction-group-time-averaged');
-        mkdir(outputFolder);
-        h = figure(1);
-        boxplot(perc, 'Labels', {'270-330', '330-30', '30-90', '90-270'});
-        xlabel('Region in degrees');
-        ylabel('Frequency of direcions of the time-averaged velocity for each region');
-        adjustfigure();
-        export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-direction-group-time-averaged.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-        close(h);
-        
-        % Average velocity plot.
-        outputFolder = fullfile(resultfolder, 'polarplot-mean-velocity');
-        mkdir(outputFolder);
-        h = figure(1);
-        for l=1:length(ds)
-            % Replicate segmentation.
-            segt = repmat(seg{l}, 1, 1, size(v1{l}, 3));
-
-            % Find segmentation.
-            idx = segt > 0;
-            
-            % Compute average velocities within segmentation.
-            meanv1 = mean(v1{l}(idx));
-            meanv2 = mean(v2{l}(idx));      
-
-            % Convert to polar coordinates.
-            [theta, rho] = cart2pol(meanv1, -meanv2);
-
-            polarplot([0, theta], [0, rho], '-');
-            hold on;
-        end
-        title('Mean velocity for each dataset.', 'Interpreter', 'latex');
-        adjustfigure();
-        export_fig(h, fullfile(outputFolder, sprintf('%s-polarplot-mean-velocity.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-        close(h);
-
-        % Mean angle plot.
-        outputFolder = fullfile(resultfolder, 'polarplot-mean-direction');
-        mkdir(outputFolder);
-        h = figure(1);
-        for l=1:length(ds)
-            % Convert to polar coordinates.
-            [~, rho] = cart2pol(v1{l}, -v2{l});
-            
-            % Replicate segmentation.
-            segt = repmat(seg{l}, 1, 1, size(v1{l}, 3));
-
-            % Find segmentation.
-            idx = segt > 0 & rho > epsilon;
-
-            % Convert to polar coordinates.
-            [theta, ~] = cart2pol(v1{l}(idx), -v2{l}(idx));
-
-            % Compute mean angle.
-            mangle = meanangle(theta);
-
-            polarplot([0, mangle], [0, 1], '-');
-            hold on;
-        end
-        title('Mean direction for each dataset.', 'Interpreter', 'latex');
-        adjustfigure();
-        export_fig(h, fullfile(outputFolder, sprintf('%s-polarplot-mean-direction.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-        close(h);
-
-        % Boxplot with magnitudes of all velocities.
-        outputFolder = fullfile(resultfolder, 'boxplot-speed-all');
-        mkdir(outputFolder);
-        rhoall = [];
-        for l=1:length(ds)            
-            % Replicate segmentation.
-            segt = repmat(seg{l}, 1, 1, size(v1{l}, 3));
-
-            % Find segmentation.
-            idx = segt > 0;
-            
-            % Convert to polar coordinates.
-            [~, tmprho] = cart2pol(v1{l}(idx), -v2{l}(idx));
-            rhoall = [rhoall; tmprho];
-        end
-        h = figure(1);
-        boxplot(rhoall, 'Labels', {groupname});
-        ylabel('$\mu$m/second', 'Interpreter', 'latex');
-        title('Speed of all velocities.', 'Interpreter', 'latex');
-        adjustfigure();
-        export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-speed-all.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-        close(h);
-        
-        % Create table with magnitudes.
-        outputFolder = fullfile(resultfolder, 'boxplot-speed-all-table');
-        mkdir(outputFolder);
-        summ = zeros(length(ds) + 1, 6);
-        for l=1:length(ds)            
-            % Replicate segmentation.
-            segt = repmat(seg{l}, 1, 1, size(v1{l}, 3));
-
-            % Find segmentation.
-            idx = segt > 0;
-            
-            % Convert to polar coordinates.
-            [~, rho] = cart2pol(v1{l}(idx), -v2{l}(idx));
-            summ(l, :) = [mean(rho), quantile(rho, [0.25, 0.5, 0.75]), min(rho), max(rho)];
-        end
-        % Add all velocities for group.
-        summ(length(ds) + 1, :) = [mean(rhoall), quantile(rhoall, [0.25, 0.5, 0.75]), min(rhoall), max(rhoall)];
-        T = table(summ(:, 1), summ(:, 2), summ(:, 3), summ(:, 4), summ(:, 5), summ(:, 6), 'VariableNames', {'Mean', 'Q25', 'Median', 'Q75', 'Min', 'Max'}, 'RowNames', {ds{:}, 'All'});
-        writetable(T, fullfile(outputFolder, sprintf('%s-boxplot-speed-all-table.txt', removebrackets(groupname))), 'WriteRowNames', true);
-        
-        % Boxplot with magnitudes of time-averaged velocities.
-        outputFolder = fullfile(resultfolder, 'boxplot-speed-time-averaged');
-        mkdir(outputFolder);
-        rhoall = [];
-        for l=1:length(ds)            
-            % Compute mean over time.
-            meanv1 = mean(v1{l}, 3);
-            meanv2 = mean(v2{l}, 3);
-            
-            % Convert to polar coordinates.
-            [~, tmprho] = cart2pol(meanv1, -meanv2);
-            
-            % Find segmentation.
-            idx = seg{l} > 0;
-            
-            % Restrict.
-            rhoall = [rhoall; tmprho(idx)];
-        end
-        h = figure(1);
-        boxplot(rhoall, 'Labels', {groupname});
-        ylabel('$\mu$m/second', 'Interpreter', 'latex');
-        title('Speed of time-averaged velocity.', 'Interpreter', 'latex');
-        adjustfigure();
-        export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-speed-time-averaged.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-        close(h);
-        
-        % Create table with magnitudes.
-        outputFolder = fullfile(resultfolder, 'boxplot-speed-time-averaged-table');
-        mkdir(outputFolder);
-        summ = zeros(length(ds) + 1, 6);
-        for l=1:length(ds)            
-            % Compute mean over time.
-            meanv1 = mean(v1{l}, 3);
-            meanv2 = mean(v2{l}, 3);
-            
-            % Convert to polar coordinates.
-            [~, rho] = cart2pol(meanv1, -meanv2);
-            
-            % Find segmentation.
-            idx = seg{l} > 0;
-            
-            % Restrict.
-            summ(l, :) = [mean(rho(idx)), quantile(rho(idx), [0.25, 0.5, 0.75]), min(rho(idx)), max(rho(idx))];
-        end
-        % Add all velocities for group.
-        summ(length(ds) + 1, :) = [mean(rhoall), quantile(rhoall, [0.25, 0.5, 0.75]), min(rhoall), max(rhoall)];
-        T = table(summ(:, 1), summ(:, 2), summ(:, 3), summ(:, 4), summ(:, 5), summ(:, 6), 'VariableNames', {'Mean', 'Q25', 'Median', 'Q75', 'Min', 'Max'}, 'RowNames', {ds{:}, 'All'});
-        writetable(T, fullfile(outputFolder, sprintf('%s-boxplot-speed-time-averaged-table.txt', removebrackets(groupname))), 'WriteRowNames', true);
+    % Create plots.
+    if(groupanalysis)
+        creategroupplots(fullfile(resultfolder, 'region-all'), groupname, ds, v1, v2, seg);
     end
-end
-
-%% Create aggregated plots for each region.
-
-if(regionanalysis)
-    % Create output folder.
-    outputFolder = fullfile(resultfolder);
-    mkdir(outputFolder);
-
-    % Add all subfolders.
-    y = dir(datapath);
-    y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
-    groups = y([y.isdir]);
-
-    fprintf('Starting analysis of folder: %s\n', datapath);
-    fprintf('Found %i groups.\n', length(groups));
-
-    % Combined analysis.
-    for k=1:length(groups)
-        groupname = groups(k).name;
-        groupfolder = fullfile(datapath, groupname);
-
-        fprintf('Group: %s\n', groupfolder);
-
-        % Run analysis.
-        [ds, v1, v2, seg, seg1, seg2, f, u] = loaddatasets(groupfolder);
-    
-        % Polar histogram of all angles for region one.
-        outputFolder = fullfile(resultfolder, 'polarhistogram-direction-region-1-all');
-        mkdir(outputFolder);
-        % Check if any dataset has a region map.
+    if(regionanalysis)
         if(any(~cellfun(@isempty, seg1)))
-            h = figure(1);
-            for l=1:length(ds)
-                % Check if region map is present.
-                if(~isempty(seg1{l}))
-                    % Convert to polar coordinates.
-                    [theta, rho] = cart2pol(v1{l}, -v2{l});
-
-                    % Replicate segmentation.
-                    segt = repmat(seg1{l}, 1, 1, size(v1{l}, 3));
-
-                    % Find segmentation.
-                    idx = segt > 0 & rho > epsilon;
-
-                    hg = polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
-                    hold on;
-                end
-            end
-            rlim([0, 0.08])
-            title('Directions of all velocities in region 1.', 'Interpreter', 'latex');
-            adjustfigure();
-            export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-region-1-all.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-            close(h);
+            creategroupplots(fullfile(resultfolder, 'region-1'), groupname, ds, v1, v2, seg1);
         end
-            
-        % Polar histogram of time-averaged angles for region one.
-        outputFolder = fullfile(resultfolder, 'polarhistogram-direction-region-1-time-averaged');
-        mkdir(outputFolder);
-        % Check if any dataset has a region map.
-        if(any(~cellfun(@isempty, seg1)))
-            h = figure(1);
-            for l=1:length(ds)
-                % Check if region map is present.
-                if(~isempty(seg1{l}))
-                    % Compute mean over time.
-                    meanv1 = mean(v1{l}, 3);
-                    meanv2 = mean(v2{l}, 3);
-
-                    % Convert to polar coordinates.
-                    [theta, ~] = cart2pol(meanv1, -meanv2);
-
-                    % Find segmentation.
-                    idx = seg1{l} > 0;
-
-                    hg = polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
-                    hold on;
-                end
-            end
-            rlim([0, 0.08])
-            title('Directions of time-averaged velocities in region 1.', 'Interpreter', 'latex');
-            adjustfigure();
-            export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-region-1-time-averaged.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-            close(h);
-        end
-
-        % Polar histogram of all angles for region two.
-        outputFolder = fullfile(resultfolder, 'polarhistogram-direction-region-2-all');
-        mkdir(outputFolder);
-        % Check if any dataset has a region map.
         if(any(~cellfun(@isempty, seg2)))
-            h = figure(1);
-            for l=1:length(ds)
-                % Check if region map is present.
-                if(~isempty(seg2{l}))
-                    % Convert to polar coordinates.
-                    [theta, rho] = cart2pol(v1{l}, -v2{l});
-
-                    % Replicate segmentation.
-                    segt = repmat(seg2{l}, 1, 1, size(v1{l}, 3));
-
-                    % Find segmentation.
-                    idx = segt > 0 & rho > epsilon;
-
-                    hg = polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
-                    hold on;
-                end
-            end
-            rlim([0, 0.08])
-            title('Directions of all velocities in region 1.', 'Interpreter', 'latex');
-            adjustfigure();
-            export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-region-2-all.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-            close(h);
+            creategroupplots(fullfile(resultfolder, 'region-2'), groupname, ds, v1, v2, seg2);
         end
-        
-        % Polar histogram of time-averaged angles for region two.
-        outputFolder = fullfile(resultfolder, 'polarhistogram-direction-region-2-time-averaged');
-        mkdir(outputFolder);
-        % Check if any dataset has a region map.
-        if(any(~cellfun(@isempty, seg2)))
-            h = figure(1);
-            for l=1:length(ds)
-                % Check if region map is present.
-                if(~isempty(seg2{l}))
-                    % Compute mean over time.
-                    meanv1 = mean(v1{l}, 3);
-                    meanv2 = mean(v2{l}, 3);
-
-                    % Convert to polar coordinates.
-                    [theta, ~] = cart2pol(meanv1, -meanv2);
-
-                    % Find segmentation.
-                    idx = seg2{l} > 0;
-
-                    hg = polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
-                    hold on;
-                end
-            end
-            rlim([0, 0.08])
-            title('Directions of time-averaged velocities in region 2.', 'Interpreter', 'latex');
-            adjustfigure();
-            export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-region-2-time-averaged.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
-            close(h);
-        end
-        
-        
     end
-end
-%%
-
-if(individualanalysis)
-    % Add all subfolders.
-    y = dir(datapath);
-    y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
-    groups = y([y.isdir]);
-
-    fprintf('Starting analysis of folder: %s\n', datapath);
-    fprintf('Found %i groups.\n', length(groups));
-
-    % Individual analysis.
-    for k=1:length(groups)
-        groupname = groups(k).name;
-        groupfolder = fullfile(datapath, groupname);
-
-        fprintf('Group: %s\n', groupfolder);
-
-        % Run analysis.
-        [ds, v1, v2, seg, seg1, seg2, f, u] = loaddatasets(groupfolder);
-
+    if(individualanalysis)
         % Run through datasets.
         for l=1:length(ds)
             % Create plots.
-            createplots(resultfolder, groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
+            createplots(fullfile(resultfolder, 'invididual'), groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
         end
-    end
+    end 
 end
 
 %%
@@ -694,6 +192,391 @@ v2 = v2 * pixelSize(dataset) / interval;
 
 end
 
+%%
+function creategroupplots(resultfolder, groupname, ds, v1, v2, seg)
+    % Set epsilon for polar histograms.
+    epsilon = 1e-3;
+
+    % Polar histogram of all angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-all');
+    mkdir(outputFolder);
+    h = figure(1);
+    for l=1:length(ds)
+        % Check if map is present for dataset.
+        if(~isempty(seg{l}))
+            % Convert to polar coordinates.
+            [theta, rho] = cart2pol(v1{l}, -v2{l});
+
+            % Replicate segmentation.
+            segt = repmat(seg{l}, 1, 1, size(v1{l}, 3));
+
+            % Find segmentation.
+            idx = segt > 0 & rho > epsilon;
+
+            polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
+            hold on;
+        end
+    end
+    rlim([0, 0.08])
+    title('Directions of all velocities.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-all.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Polar histogram of time-averaged angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-time-averaged');
+    mkdir(outputFolder);
+    h = figure(1);
+    for l=1:length(ds)
+        % Check if map is present for dataset.
+        if(~isempty(seg{l}))
+            % Compute mean over time.
+            meanv1 = mean(v1{l}, 3);
+            meanv2 = mean(v2{l}, 3);
+
+            % Convert to polar coordinates.
+            [theta, ~] = cart2pol(meanv1, -meanv2);
+
+            % Find segmentation.
+            idx = seg{l} > 0;
+
+            polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
+            hold on;
+        end
+    end
+    rlim([0, 0.08])
+    title('Directions of time-averaged velocities.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-time-averaged.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Left-right polar histogram of all angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-left-right-all');
+    mkdir(outputFolder);
+    perc = zeros(length(ds), 2);
+    h = figure(1);
+    for l=1:length(ds)
+        % Check if map is present for dataset.
+        if(~isempty(seg{l}))
+            % Convert to polar coordinates.
+            [theta, rho] = cart2pol(v1{l}, -v2{l});
+
+            % Replicate segmentation.
+            segt = repmat(seg{l}, 1, 1, size(v1{l}, 3));
+
+            % Find segmentation.
+            idx = segt > 0 & rho > epsilon;
+
+            hg = polarhistogram(theta(idx), 'BinEdges', [pi/2, 3*pi/2, 5*pi/2], 'Normalization', 'probability', 'FaceAlpha', 0.3);
+            perc(l, :) = hg.Values;
+            hold on;
+        end
+    end
+    rlim([0, 1])
+    title('Directions of all velocities.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-left-right-all.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Create table with left-right polar histogram of all angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-left-right-table');
+    mkdir(outputFolder);
+    T = table(perc(:, 1), perc(:, 2), 'VariableNames', {'Left', 'Right'}, 'RowNames', ds);
+    writetable(T, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-left-right.txt', removebrackets(groupname))), 'WriteRowNames', true);
+
+    % Left-right polar histogram of time-averaged angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-left-right-time-averaged');
+    mkdir(outputFolder);
+    perc = zeros(length(ds), 2);
+    h = figure(1);
+    for l=1:length(ds)
+        % Check if map is present for dataset.
+        if(~isempty(seg{l}))
+            % Compute mean over time.
+            meanv1 = mean(v1{l}, 3);
+            meanv2 = mean(v2{l}, 3);
+
+            % Convert to polar coordinates.
+            [theta, ~] = cart2pol(meanv1, -meanv2);
+
+            % Find segmentation.
+            idx = seg{l} > 0;
+
+            hg = polarhistogram(theta(idx), 'BinEdges', [pi/2, 3*pi/2, 5*pi/2], 'Normalization', 'probability', 'FaceAlpha', 0.3);
+            perc(l, :) = hg.Values;
+            hold on;
+        end
+    end
+    rlim([0, 1])
+    title('Directions of time-averaged velocities.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-left-right-time-averaged.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Create table with left-right polar histogram of time-averaged angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-left-right-time-averaged-table');
+    mkdir(outputFolder);
+    T = table(perc(:, 1), perc(:, 2), 'VariableNames', {'Left', 'Right'}, 'RowNames', ds);
+    writetable(T, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-left-right-time-averaged.txt', removebrackets(groupname))), 'WriteRowNames', true);
+
+    % Group polar histogram of all angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-group-all');
+    mkdir(outputFolder);
+    perc = zeros(length(ds), 4);
+    h = figure(1);
+    for l=1:length(ds)
+        % Check if map is present for dataset.
+        if(~isempty(seg{l}))
+            % Convert to polar coordinates.
+            [theta, rho] = cart2pol(v1{l}, -v2{l});
+
+            % Replicate segmentation.
+            segt = repmat(seg{l}, 1, 1, size(v1{l}, 3));
+
+            % Find segmentation.
+            idx = segt > 0 & rho > epsilon;
+
+            hg = polarhistogram(theta(idx), 'BinEdges', [-pi/2, -pi/6, pi/6, pi/2, 9*pi/6], 'Normalization', 'probability', 'FaceAlpha', 0.3);
+            perc(l, :) = hg.Values;
+            hold on;
+        end
+    end
+    rlim([0, 1])
+    title('Directions of all velocities.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-all.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Create table with group polar histogram of all angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-group-all-table');
+    mkdir(outputFolder);
+    T = table(perc(:, 1), perc(:, 2), perc(:, 3), perc(:, 4), 'VariableNames', {'deg270_330', 'deg330_30', 'deg30_90', 'deg90_270'}, 'RowNames', ds);
+    writetable(T, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-all.txt', removebrackets(groupname))), 'WriteRowNames', true);
+
+    % Group boxplot.
+    outputFolder = fullfile(resultfolder, 'boxplot-direction-group-all');
+    mkdir(outputFolder);
+    h = figure(1);
+    boxplot(perc, 'Labels', {'270-330', '330-30', '30-90', '90-270'});
+    xlabel('Region in degrees');
+    ylabel('Frequency of directions of the velocity for each region');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-direction-group-all.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Group polar histogram of time-averaged angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-group-time-averaged');
+    mkdir(outputFolder);
+    perc = zeros(length(ds), 4);
+    h = figure(1);
+    for l=1:length(ds)
+        % Check if map is present for dataset.
+        if(~isempty(seg{l}))
+            % Compute mean over time.
+            meanv1 = mean(v1{l}, 3);
+            meanv2 = mean(v2{l}, 3);
+
+            % Convert to polar coordinates.
+            [theta, ~] = cart2pol(meanv1, -meanv2);
+
+            % Find segmentation.
+            idx = seg{l} > 0;
+
+            % Plot data.
+            hg = polarhistogram(theta(idx), 'BinEdges', [-pi/2, -pi/6, pi/6, pi/2, 9*pi/6], 'Normalization', 'probability', 'FaceAlpha', 0.3);
+            perc(l, :) = hg.Values;
+            hold on;
+        end
+    end
+    rlim([0, 1])
+    title('Directions of time-averaged velocities.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-time-averaged.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Create table with group polar histogram of time-averaged angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-group-time-averaged-table');
+    mkdir(outputFolder);
+    T = table(perc(:, 1), perc(:, 2), perc(:, 3), perc(:, 4), 'VariableNames', {'deg270_330', 'deg330_30', 'deg30_90', 'deg90_270'}, 'RowNames', ds);
+    writetable(T, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-time-averaged.txt', removebrackets(groupname))), 'WriteRowNames', true);
+
+    % Group boxplot.
+    outputFolder = fullfile(resultfolder, 'boxplot-direction-group-time-averaged');
+    mkdir(outputFolder);
+    h = figure(1);
+    boxplot(perc, 'Labels', {'270-330', '330-30', '30-90', '90-270'});
+    xlabel('Region in degrees');
+    ylabel('Frequency of direcions of the time-averaged velocity for each region');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-direction-group-time-averaged.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Average velocity plot.
+    outputFolder = fullfile(resultfolder, 'polarplot-mean-velocity');
+    mkdir(outputFolder);
+    h = figure(1);
+    for l=1:length(ds)
+        % Check if map is present for dataset.
+        if(~isempty(seg{l}))
+            % Replicate segmentation.
+            segt = repmat(seg{l}, 1, 1, size(v1{l}, 3));
+
+            % Find segmentation.
+            idx = segt > 0;
+
+            % Compute average velocities within segmentation.
+            meanv1 = mean(v1{l}(idx));
+            meanv2 = mean(v2{l}(idx));      
+
+            % Convert to polar coordinates.
+            [theta, rho] = cart2pol(meanv1, -meanv2);
+
+            polarplot([0, theta], [0, rho], '-');
+            hold on;
+        end
+    end
+    title('Mean velocity for each dataset.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarplot-mean-velocity.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Mean angle plot.
+    outputFolder = fullfile(resultfolder, 'polarplot-mean-direction');
+    mkdir(outputFolder);
+    h = figure(1);
+    for l=1:length(ds)
+        % Check if map is present for dataset.
+        if(~isempty(seg{l}))
+            % Convert to polar coordinates.
+            [~, rho] = cart2pol(v1{l}, -v2{l});
+
+            % Replicate segmentation.
+            segt = repmat(seg{l}, 1, 1, size(v1{l}, 3));
+
+            % Find segmentation.
+            idx = segt > 0 & rho > epsilon;
+
+            % Convert to polar coordinates.
+            [theta, ~] = cart2pol(v1{l}(idx), -v2{l}(idx));
+
+            % Compute mean angle.
+            mangle = meanangle(theta);
+
+            polarplot([0, mangle], [0, 1], '-');
+            hold on;
+        end
+    end
+    title('Mean direction for each dataset.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarplot-mean-direction.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Boxplot with magnitudes of all velocities.
+    outputFolder = fullfile(resultfolder, 'boxplot-speed-all');
+    mkdir(outputFolder);
+    rhoall = [];
+    for l=1:length(ds)            
+        % Check if map is present for dataset.
+        if(~isempty(seg{l}))
+            % Replicate segmentation.
+            segt = repmat(seg{l}, 1, 1, size(v1{l}, 3));
+
+            % Find segmentation.
+            idx = segt > 0;
+
+            % Convert to polar coordinates.
+            [~, tmprho] = cart2pol(v1{l}(idx), -v2{l}(idx));
+            rhoall = [rhoall; tmprho];
+        end
+    end
+    h = figure(1);
+    boxplot(rhoall, 'Labels', {groupname});
+    ylabel('$\mu$m/second', 'Interpreter', 'latex');
+    title('Speed of all velocities.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-speed-all.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Create table with magnitudes.
+    outputFolder = fullfile(resultfolder, 'boxplot-speed-all-table');
+    mkdir(outputFolder);
+    summ = zeros(length(ds) + 1, 6);
+    for l=1:length(ds)            
+        % Check if map is present for dataset.
+        if(~isempty(seg{l}))
+            % Replicate segmentation.
+            segt = repmat(seg{l}, 1, 1, size(v1{l}, 3));
+
+            % Find segmentation.
+            idx = segt > 0;
+
+            % Convert to polar coordinates.
+            [~, rho] = cart2pol(v1{l}(idx), -v2{l}(idx));
+            summ(l, :) = [mean(rho), quantile(rho, [0.25, 0.5, 0.75]), min(rho), max(rho)];
+        end
+    end
+    % Add all velocities for group.
+    summ(length(ds) + 1, :) = [mean(rhoall), quantile(rhoall, [0.25, 0.5, 0.75]), min(rhoall), max(rhoall)];
+    T = table(summ(:, 1), summ(:, 2), summ(:, 3), summ(:, 4), summ(:, 5), summ(:, 6), 'VariableNames', {'Mean', 'Q25', 'Median', 'Q75', 'Min', 'Max'}, 'RowNames', {ds{:}, 'All'});
+    writetable(T, fullfile(outputFolder, sprintf('%s-boxplot-speed-all-table.txt', removebrackets(groupname))), 'WriteRowNames', true);
+
+    % Boxplot with magnitudes of time-averaged velocities.
+    outputFolder = fullfile(resultfolder, 'boxplot-speed-time-averaged');
+    mkdir(outputFolder);
+    rhoall = [];
+    for l=1:length(ds) 
+        % Check if map is present for dataset.
+        if(~isempty(seg{l}))
+            % Compute mean over time.
+            meanv1 = mean(v1{l}, 3);
+            meanv2 = mean(v2{l}, 3);
+
+            % Convert to polar coordinates.
+            [~, tmprho] = cart2pol(meanv1, -meanv2);
+
+            % Find segmentation.
+            idx = seg{l} > 0;
+
+            % Restrict.
+            rhoall = [rhoall; tmprho(idx)];
+        end
+    end
+    h = figure(1);
+    boxplot(rhoall, 'Labels', {groupname});
+    ylabel('$\mu$m/second', 'Interpreter', 'latex');
+    title('Speed of time-averaged velocity.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-speed-time-averaged.png', removebrackets(groupname))), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Create table with magnitudes.
+    outputFolder = fullfile(resultfolder, 'boxplot-speed-time-averaged-table');
+    mkdir(outputFolder);
+    summ = zeros(length(ds) + 1, 6);
+    for l=1:length(ds)      
+        % Check if map is present for dataset.
+        if(~isempty(seg{l}))
+            % Compute mean over time.
+            meanv1 = mean(v1{l}, 3);
+            meanv2 = mean(v2{l}, 3);
+
+            % Convert to polar coordinates.
+            [~, rho] = cart2pol(meanv1, -meanv2);
+
+            % Find segmentation.
+            idx = seg{l} > 0;
+
+            % Restrict.
+            summ(l, :) = [mean(rho(idx)), quantile(rho(idx), [0.25, 0.5, 0.75]), min(rho(idx)), max(rho(idx))];
+        end
+    end
+    % Add all velocities for group.
+    summ(length(ds) + 1, :) = [mean(rhoall), quantile(rhoall, [0.25, 0.5, 0.75]), min(rhoall), max(rhoall)];
+    T = table(summ(:, 1), summ(:, 2), summ(:, 3), summ(:, 4), summ(:, 5), summ(:, 6), 'VariableNames', {'Mean', 'Q25', 'Median', 'Q75', 'Min', 'Max'}, 'RowNames', {ds{:}, 'All'});
+    writetable(T, fullfile(outputFolder, sprintf('%s-boxplot-speed-time-averaged-table.txt', removebrackets(groupname))), 'WriteRowNames', true);
+end
+
+%%
 function createplots(resultfolder, groupname, dataset, v1, v2, seg, f, u)
 %CREATEPLOTS Creates plots and figures for each group.
 
@@ -705,7 +588,6 @@ function createplots(resultfolder, groupname, dataset, v1, v2, seg, f, u)
     imagesc(f(:, :, 1));
     daspect([1, 1, 1]);
     axis off;
-    %title('First frame of noisy input.', 'Interpreter', 'latex');
     adjustfigure();
     export_fig(h, fullfile(outputFolder, sprintf('%s-first-frame-noisy.png', dataset)), '-png', '-q100', '-a1', '-transparent');
     close(h);
@@ -718,149 +600,262 @@ function createplots(resultfolder, groupname, dataset, v1, v2, seg, f, u)
     imagesc(u(:, :, 1));
     daspect([1, 1, 1]);
     axis off;
-    %title('First frame of reconstruction.', 'Interpreter', 'latex');
     adjustfigure();
     export_fig(h, fullfile(outputFolder, sprintf('%s-first-frame-reconstructed.png', dataset)), '-png', '-q100', '-a1', '-transparent');
     close(h);
 
-    % Replicate.
-%     segt = repmat(seg, 1, 1, size(v1, 3));
-    
-    % Find segmentation.
-%     idx = segt > 0;
-    
-    %% Visualise velocities within segmentation.
-
-    % Convert velocities polar coordinates.
-%     [theta, rho] = cart2pol(v1, -v2);
-
-    % Find vectors where length is larger than epsilon.
-%     idx = idx & abs(rho) >= 1e-3;
-
-    % Scatter plot for velocities within segmentation.
-%     h = figure(1);
-%     polarscatter(theta(idx), rho(idx), 10, '.');
-%     title('Velocities inside segmentation.', 'Interpreter', 'latex');
-%     set(gca, 'FontName', font);
-%     set(gca, 'FontSize', fontsize);
-%     export_fig(h, fullfile(outputFolder, sprintf('%s-flow-all-scatter-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
-%     close(h);
-
-    % Polar histogram for velocities within segmentation.
-%     h = figure(1);
-%     polarhistogram(theta(idx), 50, 'Normalization', 'probability');
-%     title('Histogram of angles inside segmentation.', 'Interpreter', 'latex');
-%     set(gca, 'FontName', font);
-%     set(gca, 'FontSize', fontsize);
-%     export_fig(h, fullfile(outputFolder, sprintf('%s-flow-all-histogram-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
-%     close(h);
-
-    %% Visualise mean of velocities within segmentation.
-
+    % Visualise mean of velocities within segmentation.
     % Compute average velocities within segmentation.
     meanv1 = mean(v1, 3);
     meanv2 = mean(v2, 3);
 
-    % Convert to polar coordinates.
-    [theta, rho] = cart2pol(meanv1, -meanv2);
-    
-    % Find vectors inside segmentation and where length is larger than epsilon.
-    idx = seg > 0; % & abs(rho) >= 1e-3;
-
-    % Histogram plot.
-    outputFolder = fullfile(resultfolder, 'flow-mean-histogram-inside', removebrackets(groupname));
-    mkdir(outputFolder);
-    h = figure(1);
-    polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceColor', [1, 1, 1]./3, 'FaceAlpha', 0.3);
-    % rlim([0, 0.08])
-    %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
-    adjustfigure();
-    export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-histogram-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
-    close(h);
-    
-    % left-right histogram plot.
-    outputFolder = fullfile(resultfolder, 'flow-mean-histogram-inside-left-right', removebrackets(groupname));
-    mkdir(outputFolder);
-    h = figure(1);
-    polarhistogram(theta(idx), 'BinEdges', [-pi/2, pi/2, 3*pi/2], 'Normalization', 'probability', 'FaceColor', [1, 1, 1]./3, 'FaceAlpha', 0.3);
-    %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
-    adjustfigure();
-    export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-histogram-inside-left-right.png', dataset)), '-png', '-q100', '-a1', '-transparent');
-    close(h);
-    
-    % Group histogram plot.
-    outputFolder = fullfile(resultfolder, 'flow-mean-histogram-inside-group', removebrackets(groupname));
-    mkdir(outputFolder);
-    h = figure(1);
-    polarhistogram(theta(idx), 'BinEdges', [-pi/2, -pi/6, pi/6, pi/2, 9*pi/6], 'Normalization', 'probability', 'FaceColor', [1, 1, 1]./3, 'FaceAlpha', 0.3);
-    %title('Histogram of angles of mean velocities inside segmentation.', 'Interpreter', 'latex');
-    adjustfigure();
-    export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-histogram-inside-group.png', dataset)), '-png', '-q100', '-a1', '-transparent');
-    close(h);
-
     % Colour-coding of mean velocities.
-    outputFolder = fullfile(resultfolder, 'flow-mean-inside', removebrackets(groupname));
+    outputFolder = fullfile(resultfolder, 'velocity-time-averaged', removebrackets(groupname));
     mkdir(outputFolder);
     h = figure(1);
     imagesc(flowToColorV2(cat(3, meanv1 .* seg, meanv2 .* seg)));
     daspect([1, 1, 1]);
     axis off;
-    %title('Colour-coding of mean velocities inside segmentation.', 'Interpreter', 'latex');
     adjustfigure();
-    export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    export_fig(h, fullfile(outputFolder, sprintf('%s-velocity-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent');
     close(h);
     
-    % Convert to polar coordinates.
-    [thetam, rhom] = cart2pol(mean(meanv1(idx)), -mean(meanv2(idx)));
-    
-    % Scatter plot.
-%     outputFolder = fullfile(resultfolder, 'flow-mean-scatter-inside', removebrackets(groupname));
-%     mkdir(outputFolder);
-%     h = figure(1);
-%     polarscatter(theta(idx), rho(idx), 10, [1, 1, 1]./3, '.');
-%     hold on;
-%     polarplot([0, thetam], [0, rhom], 'r-');
-%     %title('Mean velocities inside segmentation.', 'Interpreter', 'latex');
-%     adjustfigure();
-%     export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-scatter-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
-%     close(h);
-    
-    % Histogram of magnitudes.
-    outputFolder = fullfile(resultfolder, 'flow-mean-histogram-magnitude-inside', removebrackets(groupname));
+    % Visualise magnitude of time-averaged velocities.
+    outputFolder = fullfile(resultfolder, 'speed-time-averaged', removebrackets(groupname));
     mkdir(outputFolder);
     h = figure(1);
-    histogram(rho(idx));
+    imagesc(hypot(meanv1 .* seg, meanv2 .* seg));
+    daspect([1, 1, 1]);
+    axis off;
+    colorbar;
     adjustfigure();
-    export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-histogram-magnitude-inside.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    export_fig(h, fullfile(outputFolder, sprintf('%s-speed-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent');
     close(h);
     
-    % Boxplot of magnitudes.
-    outputFolder = fullfile(resultfolder, 'flow-mean-magnitude-inside-boxplot', removebrackets(groupname));
-    mkdir(outputFolder);
-    h = figure(1);
-    boxplot(rho(idx), 'Labels', {dataset});
-    ylabel('$\mu$m/second', 'Interpreter', 'latex');
-    title('Mean magnitude of velocity.', 'Interpreter', 'latex');
-    adjustfigure();
-    export_fig(h, fullfile(outputFolder, sprintf('%s-flow-mean-magnitude-inside-boxplot.png', dataset)), '-png', '-q100', '-a1', '-transparent');
-    close(h);
-    
-    % Boxplot of magnitudes.
-    outputFolder = fullfile(resultfolder, 'flow-magnitude-inside-boxplot', removebrackets(groupname));
-    mkdir(outputFolder);
-    
-    % Convert to polar coordinates.
-    [~, rho] = cart2pol(v1(:), -v2(:));
+    % Set epsilon for polar histograms.
+    epsilon = 1e-3;
 
+    % Polar histogram of all angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-all', removebrackets(groupname));
+    mkdir(outputFolder);
     h = figure(1);
-    boxplot(rho(idx), 'Labels', {dataset});
-    ylabel('$\mu$m/second', 'Interpreter', 'latex');
-    title('Magnitude of velocity.', 'Interpreter', 'latex');
+    % Convert to polar coordinates.
+    [theta, rho] = cart2pol(v1, -v2);
+    % Replicate segmentation.
+    segt = repmat(seg, 1, 1, size(v1, 3));
+    % Find segmentation.
+    idx = segt > 0 & rho > epsilon;
+    polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
+    hold on;
+    rlim([0, 0.08])
+    title('Directions of all velocities.', 'Interpreter', 'latex');
     adjustfigure();
-    export_fig(h, fullfile(outputFolder, sprintf('%s-flow-magnitude-inside-boxplot.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-all.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Polar histogram of time-averaged angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-time-averaged', removebrackets(groupname));
+    mkdir(outputFolder);
+    h = figure(1);
+    % Compute mean over time.
+    meanv1 = mean(v1, 3);
+    meanv2 = mean(v2, 3);
+
+    % Convert to polar coordinates.
+    [theta, ~] = cart2pol(meanv1, -meanv2);
+
+    % Find segmentation.
+    idx = seg > 0;
+
+    polarhistogram(theta(idx), 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
+    hold on;
+    rlim([0, 0.08])
+    title('Directions of time-averaged velocities.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Left-right polar histogram of all angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-left-right-all', removebrackets(groupname));
+    mkdir(outputFolder);
+    h = figure(1);
+    % Convert to polar coordinates.
+    [theta, rho] = cart2pol(v1, -v2);
+
+    % Replicate segmentation.
+    segt = repmat(seg, 1, 1, size(v1, 3));
+
+    % Find segmentation.
+    idx = segt > 0 & rho > epsilon;
+
+    polarhistogram(theta(idx), 'BinEdges', [pi/2, 3*pi/2, 5*pi/2], 'Normalization', 'probability', 'FaceAlpha', 0.3);
+    hold on;
+    rlim([0, 1])
+    title('Directions of all velocities.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-left-right-all.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Left-right polar histogram of time-averaged angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-left-right-time-averaged', removebrackets(groupname));
+    mkdir(outputFolder);
+    h = figure(1);
+    % Compute mean over time.
+    meanv1 = mean(v1, 3);
+    meanv2 = mean(v2, 3);
+
+    % Convert to polar coordinates.
+    [theta, ~] = cart2pol(meanv1, -meanv2);
+
+    % Find segmentation.
+    idx = seg > 0;
+
+    polarhistogram(theta(idx), 'BinEdges', [pi/2, 3*pi/2, 5*pi/2], 'Normalization', 'probability', 'FaceAlpha', 0.3);
+    hold on;
+    rlim([0, 1])
+    title('Directions of time-averaged velocities.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-left-right-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Group polar histogram of all angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-group-all', removebrackets(groupname));
+    mkdir(outputFolder);
+    h = figure(1);
+    % Convert to polar coordinates.
+    [theta, rho] = cart2pol(v1, -v2);
+
+    % Replicate segmentation.
+    segt = repmat(seg, 1, 1, size(v1, 3));
+
+    % Find segmentation.
+    idx = segt > 0 & rho > epsilon;
+
+    polarhistogram(theta(idx), 'BinEdges', [-pi/2, -pi/6, pi/6, pi/2, 9*pi/6], 'Normalization', 'probability', 'FaceAlpha', 0.3);
+    hold on;
+    rlim([0, 1])
+    title('Directions of all velocities.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-all.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Group polar histogram of time-averaged angles.
+    outputFolder = fullfile(resultfolder, 'polarhistogram-direction-group-time-averaged');
+    mkdir(outputFolder);
+    h = figure(1);
+    % Compute mean over time.
+    meanv1 = mean(v1, 3);
+    meanv2 = mean(v2, 3);
+
+    % Convert to polar coordinates.
+    [theta, ~] = cart2pol(meanv1, -meanv2);
+
+    % Find segmentation.
+    idx = seg > 0;
+
+    % Plot data.
+    polarhistogram(theta(idx), 'BinEdges', [-pi/2, -pi/6, pi/6, pi/2, 9*pi/6], 'Normalization', 'probability', 'FaceAlpha', 0.3);
+    hold on;
+    rlim([0, 1])
+    title('Directions of time-averaged velocities.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Average velocity plot.
+    outputFolder = fullfile(resultfolder, 'polarplot-mean-velocity', removebrackets(groupname));
+    mkdir(outputFolder);
+    h = figure(1);
+    % Replicate segmentation.
+    segt = repmat(seg, 1, 1, size(v1, 3));
+
+    % Find segmentation.
+    idx = segt > 0;
+
+    % Compute average velocities within segmentation.
+    meanv1 = mean(v1(idx));
+    meanv2 = mean(v2(idx));      
+
+    % Convert to polar coordinates.
+    [theta, rho] = cart2pol(meanv1, -meanv2);
+
+    polarplot([0, theta], [0, rho], '-');
+    hold on;
+    title('Mean velocity for each dataset.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarplot-mean-velocity.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Mean angle plot.
+    outputFolder = fullfile(resultfolder, 'polarplot-mean-direction', removebrackets(groupname));
+    mkdir(outputFolder);
+    h = figure(1);
+    % Convert to polar coordinates.
+    [~, rho] = cart2pol(v1, -v2);
+
+    % Replicate segmentation.
+    segt = repmat(seg, 1, 1, size(v1, 3));
+
+    % Find segmentation.
+    idx = segt > 0 & rho > epsilon;
+
+    % Convert to polar coordinates.
+    [theta, ~] = cart2pol(v1(idx), -v2(idx));
+
+    % Compute mean angle.
+    mangle = meanangle(theta);
+
+    polarplot([0, mangle], [0, 1], '-');
+    hold on;
+    title('Mean direction for each dataset.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-polarplot-mean-direction.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Boxplot with magnitudes of all velocities.
+    outputFolder = fullfile(resultfolder, 'boxplot-speed-all', removebrackets(groupname));
+    mkdir(outputFolder);
+    % Replicate segmentation.
+    segt = repmat(seg, 1, 1, size(v1, 3));
+
+    % Find segmentation.
+    idx = segt > 0;
+
+    % Convert to polar coordinates.
+    [~, rhoall] = cart2pol(v1(idx), -v2(idx));
+    h = figure(1);
+    boxplot(rhoall, 'Labels', {groupname});
+    ylabel('$\mu$m/second', 'Interpreter', 'latex');
+    title('Speed of all velocities.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-speed-all.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+    close(h);
+
+    % Boxplot with magnitudes of time-averaged velocities.
+    outputFolder = fullfile(resultfolder, 'boxplot-speed-time-averaged', removebrackets(groupname));
+    mkdir(outputFolder);
+    % Compute mean over time.
+    meanv1 = mean(v1, 3);
+    meanv2 = mean(v2, 3);
+
+    % Convert to polar coordinates.
+    [~, tmprho] = cart2pol(meanv1, -meanv2);
+
+    % Find segmentation.
+    idx = seg > 0;
+
+    % Restrict.
+    rhoall = tmprho(idx);
+    h = figure(1);
+    boxplot(rhoall, 'Labels', {groupname});
+    ylabel('$\mu$m/second', 'Interpreter', 'latex');
+    title('Speed of time-averaged velocity.', 'Interpreter', 'latex');
+    adjustfigure();
+    export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-speed-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent');
     close(h);
 end
 
+%%
 function adjustfigure()
     set(gca, 'FontName', 'Arial');
     set(gca, 'FontSize', 20);
