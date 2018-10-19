@@ -32,6 +32,9 @@ regionanalysis = true;
 % Flag for individual analysis.
 individualanalysis = true;
 
+% Flag to output noisym and reconstructed images, and the flow.
+sequenceanalysis = true;
+
 % Create output folder.
 outputFolder = fullfile(resultfolder);
 mkdir(outputFolder);
@@ -72,7 +75,12 @@ for k=1:length(groups)
             % Create plots.
             createplots(fullfile(resultfolder, 'invididual'), groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
         end
-    end 
+    end
+    if(sequenceanalysis)
+        for l=1:length(ds)
+            outputsequence(fullfile(resultfolder, 'sequences'), groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
+        end
+    end
 end
 
 function [ds, v1, v2, seg, seg1, seg2, f, u] = loaddatasets(groupfolder)
