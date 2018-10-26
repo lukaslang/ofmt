@@ -18,7 +18,7 @@ function creategroupplots(resultfolder, groupname, ds, v1, v2, seg)
 %CREATEGROUPPLOTS Creates plots and figures for each group.
 
 % Set epsilon for polar histograms.
-epsilon = 1e-3;
+epsilon = -inf;
 
 % Polar histogram of all angles.
 outputFolder = fullfile(resultfolder, 'polarhistogram-direction-all');

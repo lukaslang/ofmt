@@ -32,8 +32,11 @@ regionanalysis = true;
 % Flag for individual analysis.
 individualanalysis = true;
 
-% Flag to output noisym and reconstructed images, and the flow.
+% Flag to output noisy and reconstructed images, and the flow.
 sequenceanalysis = true;
+
+% Flag to output plots for thresholded images.
+thresholdedanalysis = false;
 
 % Create output folder.
 outputFolder = fullfile(resultfolder);
@@ -79,6 +82,11 @@ for k=1:length(groups)
     if(sequenceanalysis)
         for l=1:length(ds)
             outputsequence(fullfile(resultfolder, 'sequences'), groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
+        end
+    end
+    if(thresholdedanalysis)
+        for l=1:length(ds)
+            createthresholdedplots(fullfile(resultfolder, 'invididual'), groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
         end
     end
 end
@@ -148,8 +156,10 @@ while(exist(fullfile(groupfolder, sprintf('%s_%d', dataset, l)), 'dir'))
     f = cat(3, f, W.imageStack);
     V = load(fullfile(folder, 'mat', 'results.mat'), 'v', 'u');
     u = cat(3, u, V.u);
-    v1 = cat(3, v1, V.v(:, :, :, 1));
-    v2 = cat(3, v2, V.v(:, :, :, 2));
+    
+    % Remove last frame as jointModelLargeScale returns zeros.
+    v1 = cat(3, v1, V.v(:, :, 1:end-1, 1));
+    v2 = cat(3, v2, V.v(:, :, 1:end-1, 2));
 
     % Load segmentation of first sequence.
     if(l == 1)
