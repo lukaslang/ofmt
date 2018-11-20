@@ -26,7 +26,7 @@ imagesc(f(:, :, 1));
 daspect([1, 1, 1]);
 axis off;
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-first-frame-noisy.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+export_fig(h, fullfile(outputFolder, sprintf('%s-first-frame-noisy.png', dataset)), '-png', '-q100', '-a1', '-transparent', '-native');
 close(h);
 
 % First frame of reconstructed image.
@@ -38,7 +38,7 @@ imagesc(u(:, :, 1));
 daspect([1, 1, 1]);
 axis off;
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-first-frame-reconstructed.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+export_fig(h, fullfile(outputFolder, sprintf('%s-first-frame-reconstructed.png', dataset)), '-png', '-q100', '-a1', '-transparent', '-native');
 close(h);
 
 % Visualise mean of velocities within segmentation.
@@ -54,7 +54,7 @@ imagesc(flowToColorV2(cat(3, meanv1 .* seg, meanv2 .* seg)));
 daspect([1, 1, 1]);
 axis off;
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-velocity-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+export_fig(h, fullfile(outputFolder, sprintf('%s-velocity-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent', '-native');
 close(h);
 
 % Visualise magnitude of time-averaged velocities.
@@ -66,7 +66,7 @@ daspect([1, 1, 1]);
 axis off;
 colorbar;
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-speed-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+export_fig(h, fullfile(outputFolder, sprintf('%s-speed-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent', '-native');
 close(h);
 
 % Set epsilon for polar histograms.

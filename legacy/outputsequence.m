@@ -34,7 +34,7 @@ end
 % Optical flow.
 outputFolder = fullfile(resultfolder, removebrackets(groupname), removebrackets(dataset), 'flow');
 mkdir(outputFolder);
-for k=1:size(f, 3)
+for k=1:size(v1, 3)
     col = flowToColorV2noBoundary(cat(3, v1(:, :, k), v2(:, :, k)));
     imwrite(col, fullfile(outputFolder, sprintf('%s-flow-%.3i.png', dataset, k)));
 end

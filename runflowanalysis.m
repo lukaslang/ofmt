@@ -24,13 +24,22 @@ clc;
 resultfolder = fullfile('results', 'figures');
 
 % Flag to skip group analysis.
-groupanalysis = true;
+groupanalysis = false;
 
 % Flag for region analysis.
-regionanalysis = true;
+regionanalysis = false;
 
 % Flag for individual analysis.
-individualanalysis = true;
+individualanalysis = false;
+
+% Flag to output noisy and reconstructed images, and the flow.
+sequenceanalysis = true;
+
+% Flag for streamlines.
+streamlines = false;
+
+% Flag for control region.
+controlregion = false;
 
 % Create output folder.
 outputFolder = fullfile(resultfolder);
@@ -75,7 +84,30 @@ for k=1:length(groups)
             % Create plots.
             createplots(fullfile(resultfolder, 'invididual'), groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
         end
-    end 
+    end
+    if(sequenceanalysis)
+        for l=1:length(ds)
+            outputsequence(fullfile(resultfolder, 'sequences'), groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
+        end
+    end
+    if(streamlines)
+        for l=1:length(ds)
+            createstreamlines(fullfile(resultfolder, 'invididual'), groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
+        end
+    end
+    if(controlregion)
+        for l=1:length(ds)
+            % Select region.
+            X = 1:512;
+            Y = 128:256;
+            segr = ~(seg{l}(X, Y) > 0);
+            fr = f{l}(X, Y, :);
+            ur = u{l}(X, Y, :);
+            v1r = v1{l}(X, Y, :);
+            v2r = v2{l}(X, Y, :);
+            createplots(fullfile(resultfolder, 'controlregion'), groupname, ds{l}, v1r, v2r, segr, fr, ur);
+        end
+    end
 end
 
 function [ds, v1, v2, seg, seg1, seg2, f, u] = loaddatasets(groupfolder)
@@ -177,11 +209,14 @@ valueSet = [0.303, 0.217, 0.23, 0.303, 0.188, 0.257, 0.269, 0.298,...
 assert(length(keySet) == length(unique(keySet)));
 pixelSize = containers.Map(keySet,valueSet);
 
-% Set interval between frames (seconds).
-interval = 0.65;
+if(~pixelSize.isKey(dataset))
+    warning('No pixel size or interval set for sequence: %s.\n', dataset);
+else
+    % Set interval between frames (seconds).
+    interval = 0.65;
 
-% Scale velocities according to pixel size.
-v1 = v1 * pixelSize(dataset) / interval;
-v2 = v2 * pixelSize(dataset) / interval;
-
+    % Scale velocities according to pixel size.
+    v1 = v1 * pixelSize(dataset) / interval;
+    v2 = v2 * pixelSize(dataset) / interval;
+end
 end
