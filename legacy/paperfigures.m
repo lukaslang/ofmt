@@ -27,7 +27,7 @@ resultfolder = fullfile('results', 'figures');
 groupanalysis = false;
 
 % Flag for region analysis.
-regionanalysis = false;
+regionanalysis = true;
 
 % Flag for individual analysis.
 individualanalysis = false;
@@ -42,7 +42,7 @@ thresholdedanalysis = false;
 streamlines = false;
 
 % Flag for control region.
-controlregion = true;
+controlregion = false;
 
 % Create output folder.
 outputFolder = fullfile(resultfolder);
@@ -119,8 +119,8 @@ function [ds, v1, v2, seg, seg1, seg2, f, u] = loaddatasets(groupfolder)
 %LOADDATASET Groups split sequences to datasets in one group.
 
 % Define outlier datasets.
-keySet = {'11_036'};
-valueSet = {true};
+keySet = {'11_036', '12_037'};
+valueSet = {true, true};
 M = containers.Map(keySet, valueSet);
 
 % Load datasets.
@@ -138,12 +138,7 @@ end
 uds = unique(ds);
 
 % Remove outliers.
-ds = cell(0, 1);
-for k=1:length(uds)
-    if ~isKey(M, uds{k})
-        ds{k} = uds{k};
-    end
-end
+ds = uds(cellfun(@(x) ~isKey(M, x), uds, 'UniformOutput', true));
 
 % Iterate through unique datasets.
 for k=1:length(ds)
