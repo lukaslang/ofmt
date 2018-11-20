@@ -215,11 +215,14 @@ valueSet = [0.303, 0.217, 0.23, 0.303, 0.188, 0.257, 0.269, 0.298,...
 assert(length(keySet) == length(unique(keySet)));
 pixelSize = containers.Map(keySet,valueSet);
 
-% Set interval between frames (seconds).
-interval = 0.65;
+if(~pixelSize.isKey(dataset))
+    warning('No pixel size or interval set for sequence: %s.\n', dataset);
+else
+    % Set interval between frames (seconds).
+    interval = 0.65;
 
-% Scale velocities according to pixel size.
-v1 = v1 * pixelSize(dataset) / interval;
-v2 = v2 * pixelSize(dataset) / interval;
-
+    % Scale velocities according to pixel size.
+    v1 = v1 * pixelSize(dataset) / interval;
+    v2 = v2 * pixelSize(dataset) / interval;
+end
 end
