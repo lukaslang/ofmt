@@ -60,12 +60,13 @@ for k=1:length(groups)
         u = cell(numel(folderContent), 1);
         f = cell(numel(folderContent), 1);
         for p=1:numel(folderContent)
-            R = load(fullfile(outputfolder, folderContent(p).name), 'f', 'uinit', 'u', 'v');
+            R = load(fullfile(outputfolder, folderContent(p).name));
             v1{p} = R.v(:, :, :, 1);
             v2{p} = R.v(:, :, :, 2);
             uinit{p} = R.uinit;
             u{p} = R.u;
             f{p} = R.f;
+            fprintf('Result %.2i, alpha=%g, beta=%g, gamma=%g\n', p, R.alpha, R.beta, R.gamma);
         end
 
         % Plot results.
@@ -87,10 +88,10 @@ for k=1:length(groups)
         flow = cat(1, fseq, flowToColorV2noBoundary(cat(3, x1, x2)));
         img = cat(2, uinit, u, flow);
         imwrite(img, fullfile(resultfolder, removebrackets(groupname), sprintf('%s-results.png', dataset)));
-        figure;
-        imagesc(img);
-        axis image;
-        title('Results.');
+        %figure;
+        %imagesc(img);
+        %axis image;
+        %title('Results.');
     end
 end
 
