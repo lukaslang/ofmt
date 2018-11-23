@@ -33,9 +33,9 @@ fprintf('Starting analysis of folder: %s\n', datapath);
 fprintf('Found %i groups.\n', length(groups));
 
 % Set parameter range (alpha, beta, gamma) and generate combinations.
-params = {[1e-3, 1e-1], [1e-3, 1e-1], [1e-1, 1e-0]};
-[alpha, beta, gamma] = ndgrid(params{:});
-ncombs = numel(alpha);
+params = {[1e-3, 5e-3, 1e-2], [1e-3, 1e-2, 1e-1], [1e-1, 5e-1, 1e-0]};
+[param1, param2, param3] = ndgrid(params{:});
+ncombs = numel(param1);
 
 % Run through all groups.
 for k=1:length(groups)
@@ -54,11 +54,14 @@ for k=1:length(groups)
         
         % Compute and save results.
         for p=1:ncombs
+            alpha = param1(p);
+            beta = param2(p);
+            gamma = param3(p);
             fprintf('Parameter combination %.2i/%.2i.\n', p, ncombs);
             tic;
-            [f, uinit, u, v] = runjointmodel(datafolder, alpha(p), beta(p), gamma(p));
+            [f, uinit, u, v] = runjointmodel(datafolder, alpha, beta, gamma);
             toc;
-            save(fullfile(outputfolder, sprintf('results-%.2i.mat', p)), 'f', 'uinit', 'u', 'v');
+            save(fullfile(outputfolder, sprintf('results-%.2i.mat', p)), 'f', 'uinit', 'u', 'v', 'alpha', 'beta', 'gamma');
         end
     end
 end
