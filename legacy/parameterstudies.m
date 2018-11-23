@@ -33,7 +33,7 @@ fprintf('Starting analysis of folder: %s\n', datapath);
 fprintf('Found %i groups.\n', length(groups));
 
 % Set parameter range (alpha, beta, gamma) and generate combinations.
-params = {[5e-3, 1e-2, 5e-2], [1e-2, 5e-2, 1e-1], [1e-1, 5e-1, 1e0]};
+params = {[5e-3, 1e-2, 5e-2], [1e-2, 5e-2, 1e-1], [1e0, 1e1, 1e2]};
 [param1, param2, param3] = ndgrid(params{:});
 ncombs = numel(param1);
 
