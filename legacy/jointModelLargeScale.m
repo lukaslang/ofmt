@@ -168,7 +168,10 @@ classdef jointModelLargeScale < handle
             %create initial u and v
             initialU = flexBox;
             initialU.params.tryCPP = 1;
-
+            initialU.params.tol = 1e-6;
+            initialU.params.maxIt = 100000;
+            initialU.params.checkError = 1000;
+            
             for i=1:obj.numFrames
                 %add primal variable for each image
                 initialU.addPrimalVar(obj.dims);
@@ -211,6 +214,9 @@ classdef jointModelLargeScale < handle
             
             obj.mainV = motionEstimatorClass(obj.u,obj.tolV,obj.beta / obj.gamma,'verbose',obj.verbose,'doGradientConstancy',obj.doGradientConstancy,'medianFiltering',obj.medianFiltering,'doWarping',obj.doWarping,'imageDiscretization',imageDiscretization,'regularizerTerm',obj.regularizerTermV);
             obj.mainV.init;
+            obj.mainV.flexboxObj.params.tol = 1e-6;
+            obj.mainV.flexboxObj.params.maxIt = 100000;
+            obj.mainV.flexboxObj.params.checkError = 1000;
             
             obj.solveV;
             
@@ -221,6 +227,8 @@ classdef jointModelLargeScale < handle
             obj.mainU.params.tol = 1e-6;
             obj.mainU.params.verbose = obj.verbose;
             obj.mainU.params.tryCPP = 1;
+            obj.mainU.params.maxIt = 100000;
+            obj.mainU.params.checkError = 1000;
     
             %add for each frame data term and tv term
             for i=1:obj.numFrames
