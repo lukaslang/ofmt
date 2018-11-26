@@ -39,13 +39,15 @@ mkdir(resultfolder);
 % Set parameter range and generate combinations.
 switch method
     case 'joint-approach'
-        params = {[5e-3, 1e-2, 5e-2], [1e-2, 5e-2, 1e-1], [1e0, 1e1, 1e2]};
-        [param1, param2, param3] = ndgrid(params{:});
+        %params = {[5e-3, 1e-2, 5e-2], [1e-2, 5e-2, 1e-1], [1e0, 1e1, 1e2]};
+        params = {[1e-2, 5e-2], [5e-2, 1e-1], [1e1, 1e2]};
+        [params{1}, params{2}, params{3}] = ndgrid(params{:});
     case 'standard-optical-flow'
-        params = {[5e-3, 1e-2], [1e-2, 1e-1], [1e-4, 1e-3], [1e-3, 1e-2]};
-        [param1, param2, param3, param4] = ndgrid(params{:});
+        %params = {[5e-3, 1e-2, 5e-2], [1e-2, 1e-1], [1e-4, 1e-3], [1e-3, 1e-2]};
+        params = {[1e-2, 5e-2], [1e-2, 1e-1], [1e-4, 1e-3], [1e-3, 1e-2]};
+        [params{1}, params{2}, params{3}, params{4}] = ndgrid(params{:});
 end
-ncombs = numel(param1);
+ncombs = numel(params{1});
 
 % Run through all groups.
 for k=1:length(groups)
@@ -73,25 +75,17 @@ for k=1:length(groups)
             fprintf('Parameter combination %.2i/%.2i.\n', p, ncombs);
             switch method
                 case 'joint-approach'
-                    alpha = param1(p);
-                    beta = param2(p);
-                    gamma = param3(p);
                     tic;
-                    [uinit, u, v] = runjointmodel(f, alpha, beta, gamma);
+                    [uinit, u, v] = runjointmodel(f, params{1}(p), params{2}(p), params{3}(p));
                     toc;
-                    u = u(:, :, 1:end-1);
-                    v = v(:, :, 1:end-1);
-                    save(fullfile(outputfolder, sprintf('results-%.2i.mat', p)), 'f', 'uinit', 'u', 'v', 'alpha', 'beta', 'gamma');
+                    v = v(:, :, 1:end-1, :);
                 case 'standard-optical-flow'
-                    alpha1 = param1(p);
-                    beta1 = param2(p);
-                    alpha2 = param3(p);
-                    beta2 = param4(p);
                     tic;
-                    [uinit, u, v] = runstandardof(f, alpha1, beta1, alpha2, beta2);
+                    [uinit, v] = runstandardof(f, params{1}(p), params{2}(p), params{3}(p), params{4}(p));
                     toc;
-                    save(fullfile(outputfolder, sprintf('results-%.2i.mat', p)), 'f', 'uinit', 'u', 'v', 'alpha1', 'beta1', 'alpha2', 'beta2');
+                    u = uinit;
             end
+            save(fullfile(outputfolder, sprintf('results-%.2i.mat', p)), 'f', 'uinit', 'u', 'v', 'params');
         end
     end
 end
@@ -116,7 +110,7 @@ function [uinit, u, v] = runjointmodel(f, alpha, beta, gamma)
 end
 
 
-function [f, u, v] = runstandardof(fdelta, alpha1, beta1, alpha2, beta2)
+function [f, v] = runstandardof(fdelta, alpha1, beta1, alpha2, beta2)
     [n, m, t] = size(fdelta);
 
     % Define denoising problem.
@@ -160,7 +154,7 @@ function [f, u, v] = runstandardof(fdelta, alpha1, beta1, alpha2, beta2)
     sigma = 1/sqrt(8);
 
     % Define termination criterion.
-    term = @(iter, p, pprev, tau, sigma) pdresidual(p, pprev, tau, sigma) < 1e-6;
+    term = @(iter, p, pprev, tau, sigma) pdresidual(p, pprev, tau, sigma) < 1e-3;
 
     % Define verbosity, logging, set plotting callback.
     alg = pdhg(tau, sigma, 50, term, 100, @logenergy);
@@ -182,4 +176,5 @@ function [f, u, v] = runstandardof(fdelta, alpha1, beta1, alpha2, beta2)
 
     % Recover solution.
     [u, v] = p.solution;
+    v = cat(4, u, v);
 end

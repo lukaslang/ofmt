@@ -26,7 +26,7 @@ y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
 groups = y([y.isdir]);
 
 % Define and create folder with results.
-resultfolder = fullfile('results', 'parameterstudies');
+resultfolder = fullfile('results', 'parameterstudies', 'standard-optical-flow');
 mkdir(resultfolder);
 
 fprintf('Starting analysis of folder: %s\n', datapath);
@@ -66,32 +66,34 @@ for k=1:length(groups)
             uinit{p} = R.uinit;
             u{p} = R.u;
             f{p} = R.f;
-            fprintf('Result %.2i, alpha=%g, beta=%g, gamma=%g\n', p, R.alpha, R.beta, R.gamma);
+            fprintf('Result %.2i', p);
+            for q =1:length(R.params)
+                fprintf(', param%i=%g', q, R.params{q}(p));
+            end
+            fprintf('\n');
         end
 
         % Plot results.
         f = f{1};
         [n, m, t] = size(f);
-        x1 = concatenatecellarrays(v1, n, m, t);
-        x2 = concatenatecellarrays(v2, n, m, t);
+        x1 = concatenatecellarrays(v1, n, m, t - 1);
+        x2 = concatenatecellarrays(v2, n, m, t - 1);
         fseq = reshape(uint8(255*f(:, :, 1:end)), n, m * t);
         fseq = cat(3, fseq, fseq, fseq);
-        
-        uinit = concatenatecellarrays(uinit, n, m, t);
+
+        uinit = cellfun(@(x) x(:, :, 1), uinit, 'UniformOutput', false);
+        uinit = concatenatecellarrays(uinit, n, m, 1);
         uinit = 255 * cat(3, uinit, uinit, uinit);
-        uinit = cat(1, fseq, uinit);
-        
-        u = concatenatecellarrays(u, n, m, t);
+        uinit = cat(1, 255*ones(n, m, 3), uinit);
+
+        u = cellfun(@(x) x(:, :, 1), u, 'UniformOutput', false);
+        u = concatenatecellarrays(u, n, m, 1);
         u = 255 * cat(3, u, u, u);
-        u = cat(1, fseq, u);
+        u = cat(1, 255*ones(n, m, 3), u);
         
-        flow = cat(1, fseq, flowToColorV2noBoundary(cat(3, x1, x2)));
+        flow = cat(1, fseq, cat(2, flowToColorV2noBoundary(cat(3, x1, x2)), 255*ones(n*numel(folderContent), m, 3)));
         img = cat(2, uinit, u, flow);
         imwrite(img, fullfile(resultfolder, removebrackets(groupname), sprintf('%s-results.png', dataset)));
-        %figure;
-        %imagesc(img);
-        %axis image;
-        %title('Results.');
     end
 end
 
