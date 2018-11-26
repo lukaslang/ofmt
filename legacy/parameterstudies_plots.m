@@ -26,8 +26,8 @@ y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
 groups = y([y.isdir]);
 
 % Define and create folder with results.
-resultfolder = fullfile('results', 'parameterstudies', 'joint-approach');
-% resultfolder = fullfile('results', 'parameterstudies', 'standard-optical-flow');
+% resultfolder = fullfile('results', 'parameterstudies', 'joint-approach');
+resultfolder = fullfile('results', 'parameterstudies', 'standard-optical-flow');
 mkdir(resultfolder);
 
 fprintf('Starting analysis of folder: %s\n', datapath);
@@ -92,7 +92,14 @@ for k=1:length(groups)
         u = 255 * cat(3, u, u, u);
         u = cat(1, 255*ones(n, m, 3), u);
         
-        flow = cat(1, fseq, cat(2, flowToColorV2noBoundary(cat(3, x1, x2)), 255*ones(n*numel(folderContent), m, 3)));
+        % Compute average flow.
+        meanv1 = cellfun(@(x) mean(x, 3), v1, 'UniformOutput', false);
+        meanv2 = cellfun(@(x) mean(x, 3), v2, 'UniformOutput', false);
+        meanv1 = concatenatecellarrays(meanv1, n, m, 1);
+        meanv2 = concatenatecellarrays(meanv2, n, m, 1);
+        meanflow = flowToColorV2noBoundary(cat(3, meanv1, meanv2));
+        
+        flow = cat(1, fseq, cat(2, flowToColorV2noBoundary(cat(3, x1, x2)), meanflow));
         img = cat(2, uinit, u, flow);
         imwrite(img, fullfile(resultfolder, removebrackets(groupname), sprintf('%s-results.png', dataset)));
     end
