@@ -15,7 +15,7 @@
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
 
-% This script runs parameter studies for the joint approach.
+% This script creates plots for comparison of different parameters.
 clear;
 close all;
 clc;
@@ -26,7 +26,8 @@ y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
 groups = y([y.isdir]);
 
 % Define and create folder with results.
-resultfolder = fullfile('results', 'parameterstudies', 'standard-optical-flow');
+resultfolder = fullfile('results', 'parameterstudies', 'joint-approach');
+% resultfolder = fullfile('results', 'parameterstudies', 'standard-optical-flow');
 mkdir(resultfolder);
 
 fprintf('Starting analysis of folder: %s\n', datapath);

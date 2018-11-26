@@ -15,10 +15,7 @@
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
 
-% This script runs parameter studies for the joint approach.
-clear;
-close all;
-clc;
+% This script runs parameter studies for both approaches.
 
 % Add all subfolders.
 y = dir(datapath);
@@ -28,9 +25,9 @@ groups = y([y.isdir]);
 fprintf('Starting analysis of folder: %s\n', datapath);
 fprintf('Found %i groups.\n', length(groups));
 
-% Set method.
+% Set method (set via bash script).
 % method = 'joint-approach';
-method = 'standard-optical-flow';
+% method = 'standard-optical-flow';
 
 % Define and create folder with results.
 resultfolder = fullfile('results', 'parameterstudies', method);
@@ -39,12 +36,10 @@ mkdir(resultfolder);
 % Set parameter range and generate combinations.
 switch method
     case 'joint-approach'
-        %params = {[5e-3, 1e-2, 5e-2], [1e-2, 5e-2, 1e-1], [1e0, 1e1, 1e2]};
-        params = {[1e-2, 5e-2], [5e-2, 1e-1], [1e1, 1e2]};
+        params = {[5e-3, 1e-2, 5e-2], [1e-2, 5e-2, 1e-1], [1e0, 1e1, 1e2]};
         [params{1}, params{2}, params{3}] = ndgrid(params{:});
     case 'standard-optical-flow'
-        %params = {[5e-3, 1e-2, 5e-2], [1e-2, 1e-1], [1e-4, 1e-3], [1e-3, 1e-2]};
-        params = {[1e-2, 5e-2], [1e-2, 1e-1], [1e-4, 1e-3], [1e-3, 1e-2]};
+        params = {[5e-3, 1e-2, 5e-2], [5e-2, 1e-1, 0.75], [5e-4, 1e-3, 5e-2], [1e-3, 5e-3, 1e-2]};
         [params{1}, params{2}, params{3}, params{4}] = ndgrid(params{:});
 end
 ncombs = numel(params{1});
@@ -154,7 +149,7 @@ function [f, v] = runstandardof(fdelta, alpha1, beta1, alpha2, beta2)
     sigma = 1/sqrt(8);
 
     % Define termination criterion.
-    term = @(iter, p, pprev, tau, sigma) pdresidual(p, pprev, tau, sigma) < 1e-3;
+    term = @(iter, p, pprev, tau, sigma) pdresidual(p, pprev, tau, sigma) < 1e-6;
 
     % Define verbosity, logging, set plotting callback.
     alg = pdhg(tau, sigma, 50, term, 100, @logenergy);
