@@ -209,7 +209,7 @@ classdef jointModelLargeScale < handle
                 imageDiscretization = 'interpolated';
             end
             
-            obj.mainV = motionEstimatorClass(obj.u,obj.tolV,obj.beta,'verbose',obj.verbose,'doGradientConstancy',obj.doGradientConstancy,'medianFiltering',obj.medianFiltering,'doWarping',obj.doWarping,'imageDiscretization',imageDiscretization,'regularizerTerm',obj.regularizerTermV);
+            obj.mainV = motionEstimatorClass(obj.u,obj.tolV,obj.beta / obj.gamma,'verbose',obj.verbose,'doGradientConstancy',obj.doGradientConstancy,'medianFiltering',obj.medianFiltering,'doWarping',obj.doWarping,'imageDiscretization',imageDiscretization,'regularizerTerm',obj.regularizerTermV);
             obj.mainV.init;
             
             obj.solveV;
