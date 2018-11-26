@@ -67,6 +67,8 @@ for k=1:length(groups)
             tic;
             [uinit, u, v] = runjointmodel(f, alpha, beta, gamma);
             toc;
+            u = u(:, :, 1:end-1);
+            v = v(:, :, 1:end-1);
             save(fullfile(outputfolder, sprintf('results-%.2i.mat', p)), 'f', 'uinit', 'u', 'v', 'alpha', 'beta', 'gamma');
         end
     end
