@@ -113,7 +113,7 @@ for k=1:length(groups)
             beta2 = param4(p);
             fprintf('Parameter combination %.2i/%.2i.\n', p, ncombs);
             tic;
-            [uinit, u, v] = runjointmodel(f, alpha1, beta1, alpha2, beta2);
+            [uinit, u, v] = runstandardof(f, alpha1, beta1, alpha2, beta2);
             toc;
             save(fullfile(outputfolder, sprintf('results-%.2i.mat', p)), 'f', 'uinit', 'u', 'v', 'alpha1', 'beta1', 'alpha2', 'beta2');
         end
@@ -141,6 +141,8 @@ end
 
 
 function [f, u, v] = runstandardof(fdelta, alpha1, beta1, alpha2, beta2)
+    [n, m, t] = size(fdelta);
+
     % Define denoising problem.
     p = @denoise3dl2tv;
 
