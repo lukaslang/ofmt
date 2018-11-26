@@ -90,7 +90,7 @@ function [uinit, u, v] = runjointmodel(f, alpha, beta, gamma)
     mainJoint = jointModelLargeScale(f, alpha, beta, gamma, 'temporalSmoothness', temporalSmoothness, 'verbose', 1);
     mainJoint.doWarping = false;
     mainJoint.opticalFlowTerm = 'classic';
-    mainJoint.numMainIt = 10;
+    mainJoint.numMinMainIt = 10;
     
     % Init and get denoised sequence.
     mainJoint.init; 
