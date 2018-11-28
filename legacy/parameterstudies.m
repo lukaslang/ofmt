@@ -36,7 +36,8 @@ mkdir(resultfolder);
 % Set parameter range and generate combinations.
 switch method
     case 'joint-approach'
-        params = {[5e-3, 1e-2, 5e-2], [1e-2, 5e-2, 1e-1], [1e0, 1e1, 1e2]};
+        % params = {[5e-3, 1e-2, 5e-2], [1e-2, 5e-2, 1e-1], [1e0, 1e1, 1e2]};
+        params = {[0.005], [0.01], [0.1]};
         [params{1}, params{2}, params{3}] = ndgrid(params{:});
     case 'standard-optical-flow'
         params = {[5e-3, 1e-2, 5e-2], [5e-2, 1e-1, 0.75], [5e-4, 1e-3, 5e-2], [1e-3, 5e-3, 1e-2]};
