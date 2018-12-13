@@ -14,11 +14,12 @@
 %
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
-function of(datafolder, outputfolder)
+function of(datafolder, outputfolder, alpha, beta, gpu)
 %OF Computes optical flow.
 %
-%   OF(datafolder, outputfolder) takes a data folder name, an
-%   output folder name, runs optical flow computation, and outputs results.
+%   OF(datafolder, outputfolder, alpha, beta, gpu) takes a data folder
+%   name, an output folder name, regularisation parameters alpha, beta, and
+%   a gpu device ID, and runs optical flow computation, and outputs results.
 
 % Load data.
 folderContent = dir(fullfile(datafolder, 'image-*.png'));
@@ -34,19 +35,15 @@ f = cat(3, f{:});
 % Define optical flow problem.
 p = @vecof3dl2tv;
 
-% Set regularisation parameter.
-alpha = 0.0005;
-beta = 0.005;
-
 % Set algorithm parameters.
 tau = 1/sqrt(8);
 sigma = 1/sqrt(8);
 
 % Define termination criterion.
-term = @(iter, p, pprev, tau, sigma) pdresidual(p, pprev, tau, sigma) < 1e-6;
+term = @(iter, p, pprev, tau, sigma) pdresidual(p, pprev, tau, sigma) < 1e-4;
 
 % Define verbosity, logging, set plotting callback.
-alg = pdhg(tau, sigma, 50, term, 100, @logenergy);
+alg = pdhg(tau, sigma, 500, term, 500, @logenergy);
 
 % Compute partial derivatives.
 fvec = f(:);
@@ -57,14 +54,40 @@ fy = reshape(Dy * fvec(1:n*m*(t-1)), n, m, t-1);
 ft = reshape(Dt * fvec, n, m, t);
 ft = ft(:, :, 1:end-1);
 
+% Initialise primal and dual variables.
+v = zeros(n * m * (t-1), 2);
+y = zeros(n * m * (t-1), 6);
+
+% Create derivative operators.
+[Dx, Dy, Dt] = vecderiv3dfw(m, n, t - 1, 1, 1, 1);
+
+% Check for GPU usage and transfer data.
+if(gpu > 0)
+    gpuDevice(gpu);
+    Dx = gpuArray(Dx);
+    Dy = gpuArray(Dy);
+    Dt = gpuArray(Dt);
+    fx = gpuArray(fx);
+    fy = gpuArray(fy);
+    ft = gpuArray(ft);
+    v = gpuArray(v);
+    y = gpuArray(y);
+end
+
 % Set up problem.
-p = p(fx, fy, ft, alpha, beta);
+p = p(fx, fy, ft, alpha, beta, Dx, Dy, Dt, v, y);
 
 % Run algorithm.
 stats = alg.run(p);
 
 % Recover solution.
-[v1, v2] = p.solution;
+if(gpu > 0)
+    [v1gpu, v2gpu] = p.solution;
+    v1 = gather(v1gpu);
+    v2 = gather(v2gpu);
+else
+    [v1, v2] = p.solution;
+end
 
 % Create colour representation.
 col = zeros(n, m, 3, t-1, 'uint8');

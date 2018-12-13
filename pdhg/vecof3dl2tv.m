@@ -33,7 +33,7 @@ classdef(Sealed) vecof3dl2tv < pdproblem
     end
     
     methods
-        function o = vecof3dl2tv(fx, fy, ft, alpha, beta)
+        function o = vecof3dl2tv(fx, fy, ft, alpha, beta, Dx, Dy, Dt, v, y)
             o.alpha = alpha;
             o.beta = beta;
             o.ft = ft(:);
@@ -42,13 +42,15 @@ classdef(Sealed) vecof3dl2tv < pdproblem
             
             % Initialise operator K.
             [o.n, o.m, o.t] = size(fx);
-            [o.Dx, o.Dy, o.Dt] = vecderiv3dfw(o.m, o.n, o.t, 1, 1, 1);
+            o.Dx = Dx;
+            o.Dy = Dy;
+            o.Dt = Dt;
             
             % Initialise primal variables.
-            o.v = zeros(o.n*o.m*o.t, 2);
+            o.v = v;
             
             % Initialise dual variables.
-            o.y = zeros(o.n*o.m*o.t, 6);
+            o.y = y;
         end
 
         function v = eval(o)
@@ -86,13 +88,9 @@ classdef(Sealed) vecof3dl2tv < pdproblem
             o.y = o.y + sigma * o.applyOperator(o.v);
 
             len = sqrt(sum((o.y(:, [1, 2, 4, 5]) / o.alpha).^2, 2));
-            o.y(:, 1) = o.y(:, 1) ./ max(1, len);
-            o.y(:, 2) = o.y(:, 2) ./ max(1, len);
-            o.y(:, 4) = o.y(:, 4) ./ max(1, len);
-            o.y(:, 5) = o.y(:, 5) ./ max(1, len);
+            o.y(:, [1, 2, 4, 5]) = o.y(:, [1, 2, 4, 5]) ./ max(1, len);
             
-            o.y(:, 3) = o.beta * o.y(:, 3) ./ (o.beta + sigma);
-            o.y(:, 6) = o.beta * o.y(:, 6) ./ (o.beta + sigma);
+            o.y(:, [3, 6]) = o.beta * o.y(:, [3, 6]) ./ (o.beta + sigma);
         end
         
         function x = primal(o)

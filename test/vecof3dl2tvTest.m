@@ -28,10 +28,26 @@ end
 
 function evalTest(testCase)
 
-fx = ones(20, 30, 10);
-fy = ones(20, 30, 10);
-ft = zeros(20, 30, 10);
-p = vecof3dl2tv(fx, fy, ft, 1, 1);
+f = zeros(20, 30, 10);
+[n, m, t] = size(f);
+
+% Compute partial derivatives.
+fvec = f(:);
+[Dx, Dy, ~] = vecderiv3dc(m, n, t-1, 1, 1, 1);
+fx = reshape(Dx * fvec(1:n*m*(t-1)), n, m, t-1);
+fy = reshape(Dy * fvec(1:n*m*(t-1)), n, m, t-1);
+[~, ~, Dt] = vecderiv3dfw(m, n, t, 1, 1, 1);
+ft = reshape(Dt * fvec, n, m, t);
+ft = ft(:, :, 1:end-1);
+
+% Initialise primal and dual variables.
+v = zeros(n * m * (t-1), 2);
+y = zeros(n * m * (t-1), 6);
+
+% Create derivative operators.
+[Dx, Dy, Dt] = vecderiv3dfw(m, n, t - 1, 1, 1, 1);
+
+p = vecof3dl2tv(fx, fy, ft, 1, 1, Dx, Dy, Dt, v, y);
 verifyEqual(testCase, p.eval(), 0);
 
 end

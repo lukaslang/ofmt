@@ -27,7 +27,7 @@ classdef(Sealed) denoise3dl2tv < pdproblem
     end
     
     methods
-        function o = denoise3dl2tv(fdelta, alpha, beta)
+        function o = denoise3dl2tv(fdelta, alpha, beta, Dx, Dy, Dt, y)
         %DENOISE3DL2TV Takes matrix fdelta of size [n, m, t] and scalars 
         % alpha, beta > 0.
             o.fdelta = fdelta(:);
@@ -38,10 +38,12 @@ classdef(Sealed) denoise3dl2tv < pdproblem
             
             % Initialise operator K.
             [o.n, o.m, o.t] = size(fdelta);
-            [o.Dx, o.Dy, o.Dt] = vecderiv3dfw(o.m, o.n, o.t, 1, 1, 1);
-            
+            o.Dx = Dx;
+            o.Dy = Dy;
+            o.Dt = Dt;
+
             % Initialise dual variables.
-            o.y = zeros(o.n*o.m*o.t, 3);
+            o.y = y;
         end
         
         function v = eval(o)            

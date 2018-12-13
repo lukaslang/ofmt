@@ -20,6 +20,17 @@ clear;
 close all;
 clc;
 
+% Set GPU device ID (0 for none).
+gpu = 0;
+
+% Set regularisation parameters for denoising problem.
+alpha1 = 0.005;
+beta1 = 0.75;
+
+% Set regularisation parameter for optical flow problem.
+alpha2 = 0.0005;
+beta2 = 0.005;
+
 % Flag to recompute all results.
 recompute = false;
 
@@ -55,12 +66,12 @@ for k=1:length(groups)
         
         % Run denoising if results don't exist.
         if(recompute || ~exist(fullfile(outputfolder, 'results-denoising.mat'), 'file'))
-            denoise(datafolder, outputfolder);
+            denoise(datafolder, outputfolder, alpha1, beta1, gpu);
         end
         
         % Run optical flow computation if results don't exist.
         if(recompute || ~exist(fullfile(outputfolder, 'results-flow.mat'), 'file'))
-            of(fullfile(outputfolder, 'denoising'), outputfolder);
+            of(fullfile(outputfolder, 'denoising'), outputfolder, alpha2, beta2, gpu);
         end
         
         % Run optical flow computation if results don't exist.
