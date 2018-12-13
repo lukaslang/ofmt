@@ -67,12 +67,12 @@ if(gpu > 0)
     Dx = gpuArray(Dx);
     Dy = gpuArray(Dy);
     Dt = gpuArray(Dt);
-    fdeltagpu = gpuArray(fdelta);
+    fdelta = gpuArray(fdelta);
     y = gpuArray(y);
 end
 
 % Set up problem.
-p = p(fdeltagpu, alpha, beta, Dx, Dy, Dt, y);
+p = p(fdelta, alpha, beta, Dx, Dy, Dt, y);
 
 % Run algorithm.
 stats = alg.run(p);
@@ -81,6 +81,7 @@ stats = alg.run(p);
 if(gpu > 0)
     fgpu = p.solution;
     f = gather(fgpu);
+    fdelta = gather(fdelta);
 else
     f = p.solution;
 end
