@@ -105,3 +105,39 @@ verifyEqual(testCase, fy' * v(:), f(:)' * vy, 'AbsTol', 1e-15);
 verifyEqual(testCase, fz' * v(:), f(:)' * vz, 'AbsTol', 1e-15);
 
 end
+
+function dominantEigenvalueTest(testCase)
+
+% Set parameter.
+hx = 1;
+hy = 1;
+hz = 1;
+m = 10;
+n = 10;
+t = 10;
+
+% Create derivative matrices.
+[Dx, Dy, Dz] = vecderiv3dfw(m, n, t, hx, hy, hz);
+
+% Create matrix.
+f = rand(n, m, t);
+f = f / norm(f(:));
+
+% Compute power iteration with K^*(K(x)) to obtain dominant eigenvalue.
+for k=1:100
+    % Apply K.
+    fx = Dx*f(:);
+    fy = Dy*f(:);
+    fz = Dz*f(:);
+    % Apply adjoint of K.
+    v = Dx'*fx(:) + Dy'*fy(:) + Dz'*fz(:);
+    L = v(:)'*f(:);
+    % Update.
+    f = v / norm(v(:));
+end
+fprintf('Largest eigenvalue is approximately %f.\n', L);
+
+% Verify adjoint property.
+verifyTrue(testCase, L <= 12);
+
+end

@@ -20,15 +20,23 @@ clear;
 close all;
 clc;
 
+% Set colour-coding function.
+% colourcode = @(v1, v2, len) computeColour(v1 / len, v2 / len);
+colourcode = @(v1, v2, len) flowToColorV2noBoundary(cat(3, v1, v2) / len);
+
 % Add all subfolders.
 y = dir(datapath);
 y = y(~cellfun(@(x) strcmp(x, '.') || strcmp(x, '..'), {y.name}));
 groups = y([y.isdir]);
 
-% Define and create folder with results.
-% resultfolder = fullfile('results', 'parameterstudies', 'joint-approach');
-resultfolder = fullfile('results', 'parameterstudies', 'standard-optical-flow');
-mkdir(resultfolder);
+% Define folder with results.
+%method = 'joint-approach';
+method = 'standard-optical-flow';
+resultfolder = fullfile('results', 'parameterstudies', method);
+
+% Define figure folder.
+figurefolder = fullfile('results', 'figures', 'parameterstudies', method);
+mkdir(figurefolder);
 
 fprintf('Starting analysis of folder: %s\n', datapath);
 fprintf('Found %i groups.\n', length(groups));
@@ -73,35 +81,75 @@ for k=1:length(groups)
             end
             fprintf('\n');
         end
-
-        % Plot results.
+        
+        % Create folders.
+        mkdir(fullfile(figurefolder, removebrackets(groupname)));
+        mkdir(fullfile(figurefolder, removebrackets(groupname), 'flow'));
+        mkdir(fullfile(figurefolder, removebrackets(groupname), 'flow-first-frame'));
+        mkdir(fullfile(figurefolder, removebrackets(groupname), 'flowmean'));
+        mkdir(fullfile(figurefolder, removebrackets(groupname), 'denoised'));
+        mkdir(fullfile(figurefolder, removebrackets(groupname), 'denoised-first-frame'));
+        mkdir(fullfile(figurefolder, removebrackets(groupname), 'composition'));
+        
+        % Output sequence.
         f = f{1};
         [n, m, t] = size(f);
-        x1 = concatenatecellarrays(v1, n, m, t - 1);
-        x2 = concatenatecellarrays(v2, n, m, t - 1);
         fseq = reshape(uint8(255*f(:, :, 1:end)), n, m * t);
-        fseq = cat(3, fseq, fseq, fseq);
+        %fseq = cat(3, fseq, fseq, fseq);
+        imwrite(fseq, fullfile(figurefolder, removebrackets(groupname), sprintf('%s.png', dataset)));
 
-        uinit = cellfun(@(x) x(:, :, 1), uinit, 'UniformOutput', false);
-        uinit = concatenatecellarrays(uinit, n, m, 1);
-        uinit = 255 * cat(3, uinit, uinit, uinit);
-        uinit = cat(1, 255*ones(n, m, 3), uinit);
-
-        u = cellfun(@(x) x(:, :, 1), u, 'UniformOutput', false);
-        u = concatenatecellarrays(u, n, m, 1);
-        u = 255 * cat(3, u, u, u);
-        u = cat(1, 255*ones(n, m, 3), u);
-        
-        % Compute average flow.
+        % Compute mean of flow.
         meanv1 = cellfun(@(x) mean(x, 3), v1, 'UniformOutput', false);
         meanv2 = cellfun(@(x) mean(x, 3), v2, 'UniformOutput', false);
-        meanv1 = concatenatecellarrays(meanv1, n, m, 1);
-        meanv2 = concatenatecellarrays(meanv2, n, m, 1);
-        meanflow = flowToColorV2noBoundary(cat(3, meanv1, meanv2));
+        meanlen = max(cellfun(@(x, y) max(hypot(x(:), y(:))), meanv1, meanv2, 'UniformOutput', true));
         
-        flow = cat(1, fseq, cat(2, flowToColorV2noBoundary(cat(3, x1, x2)), meanflow));
-        img = cat(2, uinit, u, flow);
-        imwrite(img, fullfile(resultfolder, removebrackets(groupname), sprintf('%s-results.png', dataset)));
+        % Compute scaling for flow.
+        len = 1;
+        % len = max(cellfun(@(x, y) max(hypot(x(:), y(:))), v1, v2, 'UniformOutput', true));
+        % len = max(len, meanlen);
+        
+        uinitf = cellfun(@(x) x(:, :, 1), uinit, 'UniformOutput', false);
+        uf = cellfun(@(x) x(:, :, 1), u, 'UniformOutput', false);
+        for p=1:numel(folderContent)
+            v1r = reshape(v1{p}, n, m * (t - 1));
+            v2r = reshape(v2{p}, n, m * (t - 1));
+            col = colourcode(v1r, v2r, len);
+            imwrite(col, fullfile(figurefolder, removebrackets(groupname), 'flow', sprintf('%s-flow-%.2i.png', dataset, p)));
+            imwrite(colourcode(v1{p}(:, :, 1), v2{p}(:, :, 1), len), fullfile(figurefolder, removebrackets(groupname), 'flow-first-frame', sprintf('%s-flow-first-frame-%.2i.png', dataset, p)));
+            
+            imwrite(reshape(u{p}, n, m * t), fullfile(figurefolder, removebrackets(groupname), 'denoised', sprintf('%s-denoised-%.2i.png', dataset, p)));
+            imwrite(uf{p}, fullfile(figurefolder, removebrackets(groupname), 'denoised-first-frame', sprintf('%s-denoised-first-frame-%.2i.png', dataset, p)));
+            
+            colmean = colourcode(meanv1{p}, meanv2{p}, len);
+            imwrite(colmean, fullfile(figurefolder, removebrackets(groupname), 'flowmean', sprintf('%s-flowmean-%.2i.png', dataset, p)));
+            
+            uinitr = 255 * repmat(uinitf{p}, [1, 1, 3]);
+            ur = 255 * repmat(uf{p}, [1, 1, 3]);
+            res = cat(2, uinitr, ur, col, colmean);
+            imwrite(res, fullfile(figurefolder, removebrackets(groupname), 'composition', sprintf('%s-composition-%.2i.png', dataset, p)));
+        end
+
+        % Compute flow (useful if results need to have same scaling).
+        % x1 = concatenatecellarrays(v1, n, m, t - 1);
+        % x2 = concatenatecellarrays(v2, n, m, t - 1);
+        % meanv1 = concatenatecellarrays(meanv1, n, m, 1);
+        % meanv2 = concatenatecellarrays(meanv2, n, m, 1);
+        % col1 = cat(2, x1, meanv1);
+        % col2 = cat(2, x2, meanv2);
+        % flow = colourcode(col1, col2, len);
+        % imwrite(flow, fullfile(resultfolder, removebrackets(groupname), sprintf('%s-results.png', dataset)));
+        
+        % Output first frame of initially denoised sequence.
+        %uinit = concatenatecellarrays(uinit, n, m, 1);
+        %imwrite(uinit, fullfile(resultfolder, removebrackets(groupname), sprintf('%s-denoised.png', dataset)));
+        %uinit = 255 * cat(3, uinit, uinit, uinit);
+        %uinit = cat(1, 255*ones(n, m, 3), uinit);
+
+        % Output first frame of reconstructed sequence.
+        %u = concatenatecellarrays(u, n, m, 1);
+        %imwrite(u, fullfile(resultfolder, removebrackets(groupname), sprintf('%s-reconstructed.png', dataset)));
+        %u = 255 * cat(3, u, u, u);
+        %u = cat(1, 255*ones(n, m, 3), u);
     end
 end
 
