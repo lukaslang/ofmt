@@ -40,7 +40,7 @@ tau = 1/sqrt(8);
 sigma = 1/sqrt(8);
 
 % Define termination criterion.
-term = @(iter, p, pprev, tau, sigma) pdresidual(p, pprev, tau, sigma) < 1e-4;
+term = @(iter, p, pprev, tau, sigma) pdresidual(p, pprev, tau, sigma) < 1e-6;
 
 % Define verbosity, logging, set plotting callback.
 alg = pdhg(tau, sigma, 500, term, 500, @logenergy);
