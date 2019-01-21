@@ -17,6 +17,9 @@
 function createplots(resultfolder, groupname, dataset, v1, v2, seg, f, u)
 %CREATEPLOTS Creates plots and figures for each dataset.
 
+% Set plotting resolution.
+resolution = '-r300';
+
 % First frame of noisy image.
 outputFolder = fullfile(resultfolder, 'first-frame-noisy', removebrackets(groupname));
 mkdir(outputFolder);
@@ -26,7 +29,7 @@ imagesc(f(:, :, 1));
 daspect([1, 1, 1]);
 axis off;
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-first-frame-noisy.png', dataset)), '-png', '-q100', '-a1', '-transparent', '-native');
+export_fig(h, fullfile(outputFolder, sprintf('%s-first-frame-noisy.png', dataset)), '-png', resolution, '-a1', '-transparent', '-native');
 close(h);
 
 % First frame of reconstructed image.
@@ -38,7 +41,7 @@ imagesc(u(:, :, 1));
 daspect([1, 1, 1]);
 axis off;
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-first-frame-reconstructed.png', dataset)), '-png', '-q100', '-a1', '-transparent', '-native');
+export_fig(h, fullfile(outputFolder, sprintf('%s-first-frame-reconstructed.png', dataset)), '-png', resolution, '-a1', '-transparent', '-native');
 close(h);
 
 % Visualise mean of velocities within segmentation.
@@ -54,7 +57,7 @@ imagesc(flowToColorV2(cat(3, meanv1 .* seg, meanv2 .* seg)));
 daspect([1, 1, 1]);
 axis off;
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-velocity-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent', '-native');
+export_fig(h, fullfile(outputFolder, sprintf('%s-velocity-time-averaged.png', dataset)), '-png', resolution, '-a1', '-transparent', '-native');
 close(h);
 
 % Visualise magnitude of time-averaged velocities.
@@ -66,7 +69,7 @@ daspect([1, 1, 1]);
 axis off;
 colorbar;
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-speed-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent', '-native');
+export_fig(h, fullfile(outputFolder, sprintf('%s-speed-time-averaged.png', dataset)), '-png', resolution, '-a1', '-transparent', '-native');
 close(h);
 
 % Set epsilon for polar histograms.
@@ -87,7 +90,7 @@ hold on;
 rlim([0, 0.08])
 title('Directions of all velocities.', 'Interpreter', 'latex');
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-all.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-all.png', dataset)), '-png', resolution, '-a1', '-transparent');
 close(h);
 
 % Polar histogram of time-averaged angles.
@@ -109,7 +112,7 @@ hold on;
 rlim([0, 0.08])
 title('Directions of time-averaged velocities.', 'Interpreter', 'latex');
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-time-averaged.png', dataset)), '-png', resolution, '-a1', '-transparent');
 close(h);
 
 % Left-right polar histogram of all angles.
@@ -130,7 +133,7 @@ hold on;
 rlim([0, 1])
 title('Directions of all velocities.', 'Interpreter', 'latex');
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-left-right-all.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-left-right-all.png', dataset)), '-png', resolution, '-a1', '-transparent');
 close(h);
 
 % Left-right polar histogram of time-averaged angles.
@@ -152,7 +155,7 @@ hold on;
 rlim([0, 1])
 title('Directions of time-averaged velocities.', 'Interpreter', 'latex');
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-left-right-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-left-right-time-averaged.png', dataset)), '-png', resolution, '-a1', '-transparent');
 close(h);
 
 % Group polar histogram of all angles.
@@ -173,7 +176,7 @@ hold on;
 rlim([0, 1])
 title('Directions of all velocities.', 'Interpreter', 'latex');
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-all.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-all.png', dataset)), '-png', resolution, '-a1', '-transparent');
 close(h);
 
 % Group polar histogram of time-averaged angles.
@@ -196,7 +199,7 @@ hold on;
 rlim([0, 1])
 title('Directions of time-averaged velocities.', 'Interpreter', 'latex');
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-time-averaged.png', dataset)), '-png', resolution, '-a1', '-transparent');
 close(h);
 
 % Average velocity plot.
@@ -220,7 +223,7 @@ polarplot([0, theta], [0, rho], '-');
 hold on;
 title('Mean velocity for each dataset.', 'Interpreter', 'latex');
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-polarplot-mean-velocity.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+export_fig(h, fullfile(outputFolder, sprintf('%s-polarplot-mean-velocity.png', dataset)), '-png', resolution, '-a1', '-transparent');
 close(h);
 
 % Mean angle plot.
@@ -246,7 +249,7 @@ polarplot([0, mangle], [0, 1], '-');
 hold on;
 title('Mean direction for each dataset.', 'Interpreter', 'latex');
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-polarplot-mean-direction.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+export_fig(h, fullfile(outputFolder, sprintf('%s-polarplot-mean-direction.png', dataset)), '-png', resolution, '-a1', '-transparent');
 close(h);
 
 % Boxplot with magnitudes of all velocities.
@@ -265,7 +268,7 @@ boxplot(rhoall, 'Labels', {groupname});
 ylabel('$\mu$m/second', 'Interpreter', 'latex');
 title('Speed of all velocities.', 'Interpreter', 'latex');
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-speed-all.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-speed-all.png', dataset)), '-png', resolution, '-a1', '-transparent');
 close(h);
 
 % Boxplot with magnitudes of time-averaged velocities.
@@ -288,6 +291,6 @@ boxplot(rhoall, 'Labels', {groupname});
 ylabel('$\mu$m/second', 'Interpreter', 'latex');
 title('Speed of time-averaged velocity.', 'Interpreter', 'latex');
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-speed-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent');
+export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-speed-time-averaged.png', dataset)), '-png', resolution, '-a1', '-transparent');
 close(h);
 end

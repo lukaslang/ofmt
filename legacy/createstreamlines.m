@@ -17,6 +17,9 @@
 function createstreamlines(resultfolder, groupname, dataset, v1, v2, seg, f, u)
 %CREATESTREAMLINES Creates streamline plots for each dataset.
 
+% Set plotting resolution.
+resolution = '-r300';
+
 % Get size.
 [m, n, t] = size(v1);
 
@@ -55,7 +58,7 @@ colormap(cmaps);
 streamlines2(cat(3, meanv1', meanv2'), [xs(:), ys(:)], stepsize, maxit, cmaps, lineWidth);
 axis off;
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-streamlines-time-averaged.png', dataset)), '-png', '-q100', '-a1', '-transparent', '-native');
+export_fig(h, fullfile(outputFolder, sprintf('%s-streamlines-time-averaged.png', dataset)), '-png', resolution, '-a1', '-transparent', '-native');
 close(h);
 
 % Transpose and restrict flow to segmentation.
@@ -82,7 +85,7 @@ colormap(cmaps);
 streamlinesnonsteady2(cat(4, v1t, v2t), [xs(:), ys(:)], stepsize, maxit, cmaps, lineWidth);
 axis off;
 adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-streamlines.png', dataset)), '-png', '-q100', '-a1', '-transparent', '-native');
+export_fig(h, fullfile(outputFolder, sprintf('%s-streamlines.png', dataset)), '-png', resolution, '-a1', '-transparent', '-native');
 close(h);
 
 end
