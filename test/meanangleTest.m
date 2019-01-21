@@ -30,7 +30,14 @@ function resultTest(testCase)
 
 angles = [pi/2, -pi/2]';
 
-mangle = meanangle(angles);
+[mangle, r] = meanangle(angles);
 verifyEqual(testCase, mangle, 0, 'AbsTol', 1e-12);
+verifyEqual(testCase, r, 0, 'AbsTol', 1e-12);
+
+angles = [pi, pi]';
+
+[mangle, r] = meanangle(angles);
+verifyEqual(testCase, mangle, pi, 'AbsTol', 1e-12);
+verifyEqual(testCase, r, 1, 'AbsTol', 1e-12);
 
 end

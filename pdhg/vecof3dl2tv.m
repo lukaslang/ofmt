@@ -87,6 +87,7 @@ classdef(Sealed) vecof3dl2tv < pdproblem
             % Apply K to primal variables.
             o.y = o.y + sigma * o.applyOperator(o.v);
 
+            % Compute proximal maps.
             len = sqrt(sum((o.y(:, [1, 2, 4, 5]) / o.alpha).^2, 2));
             o.y(:, [1, 2, 4, 5]) = o.y(:, [1, 2, 4, 5]) ./ max(1, len);
             

@@ -283,7 +283,7 @@ for l=1:length(ds)
         [theta, ~] = cart2pol(v1{l}(idx), -v2{l}(idx));
 
         % Compute mean angle.
-        mangle = meanangle(theta);
+        [mangle, r] = meanangle(theta);
 
         polarplot([0, mangle], [0, 1], '-');
         hold on;

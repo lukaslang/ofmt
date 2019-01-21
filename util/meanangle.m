@@ -14,20 +14,25 @@
 %
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
-function m = meanangle(v)
+function [m, r] = meanangle(v)
 %MEANANGLE Computes the circular mean angle.
 %
-%   m = MEANANGLE(v) takes a vector of angles in the interval
-%   [0, 360] and returns the mean circular angle m according to
+%   [m, r] = MEANANGLE(v) takes a vector of angles in the interval
+%   [0, 2*pi] and returns the mean circular angle m according to
 %
 %   https://en.wikipedia.org/wiki/Mean_of_circular_quantities
 %
+%   and the mean resultant length r.
+%
 %   See https://rosettacode.org/wiki/Averages/Mean_angle#MATLAB_.2F_Octave
+%   See Chap. 2.2 in: Fisher, Statistical analysis of circular data, 1995.
 %
 %   v is a vector of size [n, 1].
 %
-%   m is a scalar in [0, 360).
+%   m is a scalar in [-pi, pi].
 
-m = angle(mean(exp(1i * v)));
+v = mean(exp(1i * v));
+m = angle(v);
+r = abs(v);
 
 end

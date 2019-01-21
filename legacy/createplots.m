@@ -240,7 +240,7 @@ idx = segt > 0 & rho > epsilon;
 [theta, ~] = cart2pol(v1(idx), -v2(idx));
 
 % Compute mean angle.
-mangle = meanangle(theta);
+[mangle, r] = meanangle(theta);
 
 polarplot([0, mangle], [0, 1], '-');
 hold on;
