@@ -23,6 +23,12 @@ libraryPath = '../';
 % Export Figure is required for saving figures.
 addpath(genpath(fullfile(libraryPath, 'export_fig')));
 
+% circstat-matlab is used for statistics of circular quantities.
+addpath(genpath(fullfile(libraryPath, 'circstat-matlab')));
+
+% CircHist is used for circular histogram plots.
+addpath(genpath(fullfile(libraryPath, 'CircHist')));
+
 % FlexBox is required for denoising and optical flow computation.
 addpath(genpath(fullfile(libraryPath, 'flexBox')));
 

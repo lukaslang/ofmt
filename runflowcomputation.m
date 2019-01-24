@@ -64,6 +64,12 @@ for k=1:length(groups)
         
         fprintf('Dataset: %s\n', fullfile(groupname, dataset));
         
+        % Copy segmentation maps.
+        if(recompute || ~exist(outputfolder, 'dir'))
+            mkdir(outputfolder);
+            copySegmentationMaps(datafolder, outputfolder);
+        end
+        
         % Run denoising if results don't exist.
         if(recompute || ~exist(fullfile(outputfolder, 'results-denoising.mat'), 'file'))
             denoise(datafolder, outputfolder, alpha1, beta1, gpu);
@@ -97,5 +103,22 @@ function checkSegmentationMap(groups)
                 error('Segmentation map missing for dataset: %s\n', datafolder);
             end
         end
+    end
+end
+
+function copySegmentationMaps(datafolder, outputfolder)
+% COPYSEGMENTATIONMAPS Loads and copies segmentation maps to result folder.
+    % Load and output segmentations.
+    seg = imread(fullfile(datafolder, 'images', 'segmentationMap.png'));
+    imwrite(seg, fullfile(outputfolder, 'segmentation.png'), 'png');
+    
+    if(isfile(fullfile(datafolder, 'images', 'segmentationMap1.png')))
+        seg = imread(fullfile(datafolder, 'images', 'segmentationMap1.png'));
+        imwrite(seg, fullfile(outputfolder, 'segmentation1.png'), 'png');
+    end
+    
+    if(isfile(fullfile(datafolder, 'images', 'segmentationMap2.png')))
+        seg = imread(fullfile(datafolder, 'images', 'segmentationMap2.png'));
+        imwrite(seg, fullfile(outputfolder, 'segmentation2.png'), 'png');
     end
 end

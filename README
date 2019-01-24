@@ -58,6 +58,17 @@ URL: http://www.mathworks.com/matlabcentral/fileexchange/23629-exportfig
 
 >> git clone https://github.com/altmany/export_fig.git
 
+circstat-matlab: used to compute statistics of circular quantities.
+GitHub: https://github.com/circstat/circstat-matlab
+URL: https://uk.mathworks.com/matlabcentral/fileexchange/10676-circular-statistics-toolbox-directional-statistics
+
+>> git clone https://github.com/circstat/circstat-matlab.git
+
+circHist: used to plot angular histograms.
+GitHub: https://github.com/zifredder/CircHist
+
+>> git clone https://github.com/zifredder/CircHist
+
 flexBox: used for optical flow computation.
 GitHub: https://github.com/lukaslang/flexBox.git
 Version used: a4a24d0d680b3d2d8bc87869bde812e80750f745

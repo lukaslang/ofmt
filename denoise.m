@@ -102,11 +102,6 @@ mkdir(outputfolder);
 save(fullfile(outputfolder, 'results-denoising.mat'), 'fdelta', 'f', 'fnorm', '-v7.3');
 save(fullfile(outputfolder, 'results-denoising-params.mat'), 'rngx', 'rngy', 'alpha', 'beta', 'tau', 'sigma', 'term', 'stats', '-v7.3');
 
-% Load, restrict, and output segmentation.
-seg = imread(fullfile(datafolder, 'images', 'segmentationMap.png'));
-seg = seg(rngx, rngy);
-imwrite(seg, fullfile(outputfolder, 'segmentation.png'), 'png');
-
 % Crate output folder and save images.
 outputfolder = fullfile(outputfolder, 'denoising');
 mkdir(outputfolder);
