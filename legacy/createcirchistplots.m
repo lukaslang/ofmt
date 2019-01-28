@@ -20,6 +20,10 @@ function createcirchistplots(resultfolder, groupname, ds, v1, v2, seg)
 % Set plotting resolution.
 resolution = '-r300';
 
+% Set limits for histogram bars.
+llim = -280000;
+ulim = 1400000;
+
 % Set epsilon for polar histograms.
 epsilon = -inf;
 
@@ -45,7 +49,7 @@ ch = CircHist(mod(rad2deg(theta), 360), 50);
 ch.polarAxs.ThetaZeroLocation = 'right';
 ch.fontSize = 20;
 ch.polarAxs.LineWidth = 1.5;
-ch.setRLim([-90000, 450000]);
+ch.setRLim([llim, ulim]);
 delete(ch.scaleBar);
 delete(ch.polarAxs.Title);
 export_fig(h, fullfile(outputfolder, sprintf('%s-circular-histogram-all.png', ds)), '-png', resolution, '-a1', '-transparent');

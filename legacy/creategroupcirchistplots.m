@@ -20,6 +20,10 @@ function creategroupcirchistplots(resultfolder, groupname, ds, v1, v2, seg)
 % Set plotting resolution.
 resolution = '-r300';
 
+% Set limits for histogram bars.
+llim = -280000;
+ulim = 1400000;
+
 % Set epsilon for polar histograms.
 epsilon = -inf;
 
@@ -52,35 +56,65 @@ ch = CircHist(theta, 50);
 ch.polarAxs.ThetaZeroLocation = 'right';
 ch.fontSize = 20;
 ch.polarAxs.LineWidth = 1.5;
-ch.setRLim([-90000, 450000]);
+ch.setRLim([llim, ulim]);
 delete(ch.scaleBar);
 delete(ch.polarAxs.Title);
 export_fig(h, fullfile(outputfolder, sprintf('%s-circular-histogram-all.png', groupname)), '-png', resolution, '-a1', '-transparent');
 close(h);
 
 % Create table with magnitudes.
-% outputFolder = fullfile(resultfolder, 'boxplot-speed-time-averaged-table');
-% mkdir(outputFolder);
-% summ = zeros(length(ds) + 1, 6);
-% for l=1:length(ds)      
-%     % Check if map is present for dataset.
-%     if(~isempty(seg{l}))
-%         % Compute mean over time.
-%         meanv1 = mean(v1{l}, 3);
-%         meanv2 = mean(v2{l}, 3);
-% 
-%         % Convert to polar coordinates.
-%         [~, rho] = cart2pol(meanv1, -meanv2);
-% 
-%         % Find segmentation.
-%         idx = seg{l} > 0;
-% 
-%         % Restrict.
-%         summ(l, :) = [mean(rho(idx)), quantile(rho(idx), [0.25, 0.5, 0.75]), min(rho(idx)), max(rho(idx))];
-%     end
-% end
-% % Add all velocities for group.
-% summ(length(ds) + 1, :) = [mean(rhoall), quantile(rhoall, [0.25, 0.5, 0.75]), min(rhoall), max(rhoall)];
-% T = table(summ(:, 1), summ(:, 2), summ(:, 3), summ(:, 4), summ(:, 5), summ(:, 6), 'VariableNames', {'Mean', 'Q25', 'Median', 'Q75', 'Min', 'Max'}, 'RowNames', {ds{:}, 'All'});
-% writetable(T, fullfile(outputFolder, sprintf('%s-boxplot-speed-time-averaged-table.txt', removebrackets(groupname))), 'WriteRowNames', true);
+outputFolder = fullfile(resultfolder, 'circular-histogram-table');
+mkdir(outputFolder);
+summ = zeros(length(ds) + 1, 5);
+for l=1:length(ds)      
+    % Check if map is present for dataset.
+    if(~isempty(seg{l}))
+        % Compute mean direction in degrees.
+        mu = circ_mean(thetaseg{l});
+        mu = mod(rad2deg(mu), 360);
+
+        % Compute 95% confidence limits in degrees.
+        lim = circ_confmean(thetaseg{l}, 0.05);
+        lim = mod(rad2deg(lim), 360);
+
+        % Compute length of mean vector.
+        r = circ_r(thetaseg{l});
+
+        % Compute variance.
+        S = 1 - r;
+
+        % Rayleigh test for non-uniformity.
+        pval = circ_rtest(thetaseg{l});
+
+        % Store row vector.
+        summ(l, :) = [mu, lim, r, S, pval];
+    end
+end
+
+% Compute quantities for combined data.
+theta = cell2mat(thetaseg);
+
+% Compute mean direction in degrees.
+mu = circ_mean(theta);
+mu = mod(rad2deg(mu), 360);
+
+% Compute 95% confidence limits in degrees.
+lim = circ_confmean(theta, 0.05);
+lim = mod(rad2deg(lim), 360);
+
+% Compute length of mean vector.
+r = circ_r(theta);
+
+% Compute variance.
+S = 1 - r;
+
+% Rayleigh test for non-uniformity.
+pval = circ_rtest(thetaseg{l});
+
+% Store row vector.
+summ(length(ds) + 1, :) = [mu, lim, r, S, pval];
+
+% Create and write table.
+T = table(summ(:, 1), summ(:, 2), summ(:, 3), summ(:, 4), summ(:, 5), 'VariableNames', {'mean_dir', 'conf_lim', 'r', 'var', 'p_rayleigh'}, 'RowNames', {ds{:}, 'All'});
+writetable(T, fullfile(outputFolder, sprintf('%s-circular-histogram-table.txt', removebrackets(groupname))), 'WriteRowNames', true);
 end

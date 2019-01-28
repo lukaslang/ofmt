@@ -42,11 +42,10 @@ streamlines = false;
 controlregion = false;
 
 % Flag for directional statistical analysis.
-dirstatsanalysis = true;
+dirstatsanalysis = false;
 
 % Flag for directional statistical analysis.
-groupdirstatsanalysis = true;
-
+groupdirstatsanalysis = false;
 
 % Create output folder.
 outputFolder = fullfile(resultfolder);
@@ -88,9 +87,11 @@ for k=1:length(groups)
     if(regionanalysis)
         if(any(~cellfun(@isempty, seg1)))
             creategroupplots(fullfile(resultfolder, 'region-1'), groupname, ds, v1, v2, seg1);
+            creategroupcirchistplots(fullfile(resultfolder, 'region-1'), groupname, ds, v1, v2, seg1);
         end
         if(any(~cellfun(@isempty, seg2)))
             creategroupplots(fullfile(resultfolder, 'region-2'), groupname, ds, v1, v2, seg2);
+            creategroupcirchistplots(fullfile(resultfolder, 'region-2'), groupname, ds, v1, v2, seg2);
         end
     end
     if(individualanalysis)
