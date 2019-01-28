@@ -47,6 +47,10 @@ dirstatsanalysis = false;
 % Flag for directional statistical analysis.
 groupdirstatsanalysis = false;
 
+% Set control region.
+X = 1:512;
+Y = 128:256;
+
 % Create output folder.
 outputFolder = fullfile(resultfolder);
 mkdir(outputFolder);
@@ -104,6 +108,14 @@ for k=1:length(groups)
     if(sequenceanalysis)
         for l=1:length(ds)
             outputsequence(fullfile(resultfolder, 'sequences'), groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
+
+            % Same for control region.
+            segr = ~(seg{l}(X, Y) > 0);
+            fr = f{l}(X, Y, :);
+            ur = u{l}(X, Y, :);
+            v1r = v1{l}(X, Y, :);
+            v2r = v2{l}(X, Y, :);
+            outputsequence(fullfile(resultfolder, 'sequences-controlregion'), groupname, ds{l}, v1r, v2r, segr, fr, ur);
         end
     end
     if(streamlines)
@@ -114,8 +126,6 @@ for k=1:length(groups)
     if(controlregion)
         for l=1:length(ds)
             % Select region.
-            X = 1:512;
-            Y = 128:256;
             segr = ~(seg{l}(X, Y) > 0);
             fr = f{l}(X, Y, :);
             ur = u{l}(X, Y, :);

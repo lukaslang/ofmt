@@ -1,4 +1,4 @@
-function img = flowToColorV2noBoundary(flow, varargin)
+function img = flowToColorV2(flow, varargin)
 
 %  flowToColor(flow,boundaryThickness,maxFlow) flowToColor color codes flow field,
 %  displayes a boundary layer of boundaryThickness pixels, normalize
@@ -82,6 +82,28 @@ maxNormV = max(normV(:));
 
 u = u / maxNormV;
 v = v / maxNormV;
+
+%
+%add boundary layer
+%
+%for first component
+[n1,n2]=size(u);
+
+layerTopBottom1 = repmat(-1:2/(n2-1):1,bw,1);
+layerLeft1 = -ones(n1+2*bw,bw);
+layerRight1 = ones(n1+2*bw,bw);
+
+u = [layerLeft1,[layerTopBottom1;u;layerTopBottom1],layerRight1];
+
+%for second component
+layerTop2 = -ones(bw,n2);
+layerBottom2 = ones(bw,n2);
+layerLeftRight2 = repmat((-1:2/(n1-1+2*bw):1)',1,bw);
+
+v = [layerLeftRight2,[layerTop2;v;layerBottom2],layerLeftRight2];
+%
+%
+%
 
 % compute color
 img = computeColor(u, v);  
