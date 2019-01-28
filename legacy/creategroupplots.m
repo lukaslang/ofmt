@@ -191,7 +191,7 @@ mkdir(outputFolder);
 h = figure(1);
 boxplot(perc, 'Labels', {'270-330', '330-30', '30-90', '90-270'});
 xlabel('Region in degrees');
-ylabel('Frequency of directions of the velocity for each region');
+ylabel('Frequency of directions in each region');
 adjustfigure();
 export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-direction-group-all.png', removebrackets(groupname))), '-png', resolution, '-a1', '-transparent');
 close(h);
@@ -238,7 +238,7 @@ mkdir(outputFolder);
 h = figure(1);
 boxplot(perc, 'Labels', {'270-330', '330-30', '30-90', '90-270'});
 xlabel('Region in degrees');
-ylabel('Frequency of direcions of the time-averaged velocity for each region');
+ylabel('Frequency of direcions in each region');
 adjustfigure();
 export_fig(h, fullfile(outputFolder, sprintf('%s-boxplot-direction-group-time-averaged.png', removebrackets(groupname))), '-png', resolution, '-a1', '-transparent');
 close(h);
@@ -302,6 +302,7 @@ for l=1:length(ds)
         hold on;
     end
 end
+set(gca, 'RTickLabel', []);
 %title('Mean direction for each dataset.', 'Interpreter', 'latex');
 adjustfigure();
 export_fig(h, fullfile(outputFolder, sprintf('%s-polarplot-mean-direction-all.png', removebrackets(groupname))), '-png', resolution, '-a1', '-transparent');

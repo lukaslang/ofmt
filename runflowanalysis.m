@@ -24,28 +24,28 @@ clc;
 resultfolder = fullfile('results', 'figures');
 
 % Flag to skip group analysis.
-groupanalysis = false;
+groupanalysis = true;
 
 % Flag for region analysis.
-regionanalysis = false;
+regionanalysis = true;
 
 % Flag for individual analysis.
-individualanalysis = false;
+individualanalysis = true;
 
 % Flag to output noisy and reconstructed images, and the flow.
-sequenceanalysis = false;
+sequenceanalysis = true;
 
 % Flag for streamlines.
 streamlines = false;
 
 % Flag for control region.
-controlregion = false;
+controlregion = true;
 
 % Flag for directional statistical analysis.
-dirstatsanalysis = false;
+dirstatsanalysis = true;
 
 % Flag for directional statistical analysis.
-groupdirstatsanalysis = false;
+groupdirstatsanalysis = true;
 
 % Set control region.
 X = 1:512;
@@ -90,12 +90,12 @@ for k=1:length(groups)
     end
     if(regionanalysis)
         if(any(~cellfun(@isempty, seg1)))
-            creategroupplots(fullfile(resultfolder, 'region-1'), groupname, ds, v1, v2, seg1);
-            creategroupcirchistplots(fullfile(resultfolder, 'region-1'), groupname, ds, v1, v2, seg1);
+            creategroupplots(fullfile(resultfolder, 'region-1-post'), groupname, ds, v1, v2, seg1);
+            creategroupcirchistplots(fullfile(resultfolder, 'region-1-post'), groupname, ds, v1, v2, seg1);
         end
         if(any(~cellfun(@isempty, seg2)))
-            creategroupplots(fullfile(resultfolder, 'region-2'), groupname, ds, v1, v2, seg2);
-            creategroupcirchistplots(fullfile(resultfolder, 'region-2'), groupname, ds, v1, v2, seg2);
+            creategroupplots(fullfile(resultfolder, 'region-2-ant'), groupname, ds, v1, v2, seg2);
+            creategroupcirchistplots(fullfile(resultfolder, 'region-2-ant'), groupname, ds, v1, v2, seg2);
         end
     end
     if(individualanalysis)

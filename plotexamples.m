@@ -172,6 +172,18 @@ polarhistogram(theta, 50, 'FaceColor', col(1, :), 'Normalization', 'probability'
 
 %%
 
+h = figure;
+[mangle, r] = meanangle([pi/4]);
+
+polarplot([0, mangle], [0, 1], '-');
+hold on;
+%title('Mean direction for each dataset.', 'Interpreter', 'latex');
+adjustfigure();
+set(gca, 'RTickLabel', []);
+
+
+%%
+
 function plotpolarhistogram(theta)
     %polarhistogram(theta, 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
     if(iscell(theta))

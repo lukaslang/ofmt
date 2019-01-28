@@ -231,6 +231,7 @@ idx = segt > 0;
 [mangle, r] = meanangle(theta);
 
 polarplot([0, mangle], [0, 1], '-');
+set(gca, 'RTickLabel', []);
 hold on;
 %title('Mean direction for each dataset.', 'Interpreter', 'latex');
 adjustfigure();
@@ -256,6 +257,7 @@ idx = seg > 0;
 [mangle, r] = meanangle(theta(idx));
 
 polarplot([0, mangle], [0, 1], '-');
+set(gca, 'RTickLabel', []);
 hold on;
 %title('Mean direction for time-averaged velocities..', 'Interpreter', 'latex');
 adjustfigure();
