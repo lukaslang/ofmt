@@ -163,6 +163,15 @@ ch.polarAxs.ThetaZeroLocation = 'right';
 
 %%
 
+theta = 0.01 * randn(1000, 1);
+h = figure;
+%set(gca, 'ColorOrder', 3);
+%set(gca,'ColorOrderIndex', 3);
+col = get(gca, 'ColorOrder');
+polarhistogram(theta, 50, 'FaceColor', col(1, :), 'Normalization', 'probability', 'FaceAlpha', 0.3);
+
+%%
+
 function plotpolarhistogram(theta)
     %polarhistogram(theta, 50, 'Normalization', 'probability', 'FaceAlpha', 0.3);
     if(iscell(theta))

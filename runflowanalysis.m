@@ -102,7 +102,7 @@ for k=1:length(groups)
         % Run through datasets.
         for l=1:length(ds)
             % Create plots.
-            createplots(fullfile(resultfolder, 'invididual'), groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
+            createplots(fullfile(resultfolder, 'individual'), groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
         end
     end
     if(sequenceanalysis)
