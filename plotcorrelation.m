@@ -33,12 +33,12 @@ resultFolder = fullfile('results', 'flow');
 % Load microtubule dataset.
 groupname = '08_microtubules';
 groupfolder = fullfile(resultFolder, groupname);
-[dsmt, v1mt, v2mt, segmt, seg1mt, seg2mt, fmt, umt] = loaddatasets(groupfolder);
+[dsmt, v1mt, v2mt, segmt, seg1mt, seg2mt, fmt, umt] = loaddatasets(groupfolder, groupname, true);
 
 % Load vesicles dataset.
 groupname = '09_vesicles';
 groupfolder = fullfile(resultFolder, groupname);
-[dsves, v1ves, v2ves, segves, seg1ves, seg2ves, fves, uves] = loaddatasets(groupfolder);
+[dsves, v1ves, v2ves, segves, seg1ves, seg2ves, fves, uves] = loaddatasets(groupfolder, groupname, true);
 
 % Correlate frame by frame.
 epsilon = 1e-1;
