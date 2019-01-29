@@ -1,14 +1,10 @@
-Software in this folder was created by Hendrik Dirks and contains copies of:
+Some parts of the code in this folder was created by Hendrik Dirks and
+contains uses:
 
 https://github.com/HendrikMuenster/flexBox
 https://github.com/HendrikMuenster/flexBox_CPP
 https://github.com/HendrikMuenster/motionEstimationGUI
 
-Versions are undocumented.
+Versions were undocumented.
 
-To compile flexBox with CUDA/C++ support type:
-
-cd flexBox_CPP/source
-cmake .
-make
-make install
+See the main README for more details.
