@@ -24,16 +24,19 @@ clc;
 resultfolder = fullfile('results', 'figures');
 
 % Flag to skip group analysis.
-groupanalysis = true;
+groupanalysis = false;
 
 % Flag for region analysis.
-regionanalysis = true;
+regionanalysis = false;
 
 % Flag for individual analysis.
 individualanalysis = true;
 
 % Flag to output noisy and reconstructed images, and the flow.
 sequenceanalysis = true;
+
+% Flag to output plots for thresholded images.
+thresholdedanalysis = false;
 
 % Flag for streamlines.
 streamlines = false;
@@ -108,7 +111,6 @@ for k=1:length(groups)
     if(sequenceanalysis)
         for l=1:length(ds)
             outputsequence(fullfile(resultfolder, 'sequences'), groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
-
             % Same for control region.
             segr = ~(seg{l}(X, Y) > 0);
             fr = f{l}(X, Y, :);
@@ -125,13 +127,17 @@ for k=1:length(groups)
     end
     if(controlregion)
         for l=1:length(ds)
-            % Select region.
             segr = ~(seg{l}(X, Y) > 0);
             fr = f{l}(X, Y, :);
             ur = u{l}(X, Y, :);
             v1r = v1{l}(X, Y, :);
             v2r = v2{l}(X, Y, :);
             createplots(fullfile(resultfolder, 'controlregion'), groupname, ds{l}, v1r, v2r, segr, fr, ur);
+        end
+    end
+    if(thresholdedanalysis)
+        for l=1:length(ds)
+            createthresholdedplots(fullfile(resultfolder, 'invididual-thresholded'), groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
         end
     end
 end

@@ -55,13 +55,8 @@ meanv2 = mean(v2t, 3);
 % Colour-coding of mean velocities.
 outputFolder = fullfile(resultfolder, 'velocity-time-averaged-thresholded', removebrackets(groupname));
 mkdir(outputFolder);
-h = figure(1);
-imagesc(flowToColorV2(cat(3, meanv1 .* seg, meanv2 .* seg), 10));
-daspect([1, 1, 1]);
-axis off;
-adjustfigure();
-export_fig(h, fullfile(outputFolder, sprintf('%s-velocity-time-averaged-thresholded.png', dataset)), '-png', resolution, '-a1', '-transparent');
-close(h);
+col = flowToColorV2(cat(3, meanv1 .* seg, meanv2 .* seg), 10);
+imwrite(col, fullfile(outputFolder, sprintf('%s-velocity-time-averaged-thresholded.png', dataset)));
 
 % Visualise magnitude of time-averaged velocities.
 outputFolder = fullfile(resultfolder, 'speed-time-averaged-thresholded', removebrackets(groupname));
