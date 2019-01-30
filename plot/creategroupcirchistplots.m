@@ -28,7 +28,7 @@ ulim = 1400000;
 epsilon = -inf;
 
 % Combined polar histogram of all angles.
-outputfolder = fullfile(resultfolder, 'circular-histogram');
+outputfolder = fullfile(resultfolder, 'circular-histogram-all');
 mkdir(outputfolder);
 
 thetaseg = cell(length(ds), 1);
@@ -63,7 +63,7 @@ export_fig(h, fullfile(outputfolder, sprintf('%s-circular-histogram-all.png', gr
 close(h);
 
 % Create table with magnitudes.
-outputFolder = fullfile(resultfolder, 'circular-histogram-table');
+outputFolder = fullfile(resultfolder, 'circular-histogram-all-table');
 mkdir(outputFolder);
 summ = zeros(length(ds) + 1, 5);
 for l=1:length(ds)      
@@ -116,5 +116,5 @@ summ(length(ds) + 1, :) = [mu, lim, r, S, pval];
 
 % Create and write table.
 T = table(summ(:, 1), summ(:, 2), summ(:, 3), summ(:, 4), summ(:, 5), 'VariableNames', {'mean_dir', 'conf_lim', 'r', 'var', 'p_rayleigh'}, 'RowNames', {ds{:}, 'All'});
-writetable(T, fullfile(outputFolder, sprintf('%s-circular-histogram-table.txt', removebrackets(groupname))), 'WriteRowNames', true);
+writetable(T, fullfile(outputFolder, sprintf('%s-circular-histogram-all-table.txt', removebrackets(groupname))), 'WriteRowNames', true);
 end

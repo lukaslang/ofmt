@@ -28,7 +28,7 @@ ulim = 1400000;
 epsilon = -inf;
 
 % Polar histogram of all angles.
-outputfolder = fullfile(resultfolder, 'circular-histogram', groupname);
+outputfolder = fullfile(resultfolder, 'circular-histogram-all', groupname);
 mkdir(outputfolder);
 
 % Convert to polar coordinates.

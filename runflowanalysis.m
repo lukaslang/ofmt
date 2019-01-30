@@ -24,16 +24,16 @@ clc;
 resultfolder = fullfile('results', 'figures');
 
 % Set to true if datasets were split before runflowcomputation.m script.
-issplit = true;
+issplit = false;
 
 % Flag to skip group analysis.
-groupanalysis = true;
+groupanalysis = false;
 
 % Flag for region analysis.
 regionanalysis = false;
 
 % Flag for individual analysis.
-individualanalysis = true;
+individualanalysis = false;
 
 % Flag to output noisy and reconstructed images, and the flow.
 sequenceanalysis = false;
@@ -45,13 +45,7 @@ thresholdedanalysis = false;
 streamlines = false;
 
 % Flag for control region.
-controlregion = false;
-
-% Flag for directional statistical analysis.
-dirstatsanalysis = false;
-
-% Flag for directional statistical analysis.
-groupdirstatsanalysis = false;
+controlregion = true;
 
 % Set control region.
 X = 1:512;
@@ -86,6 +80,7 @@ for k=1:length(groups)
     if(individualanalysis)
         for l=1:length(ds)
             createplots(fullfile(resultfolder, 'individual'), groupname, ds{l}, v1{l}, v2{l}, seg{l}, f{l}, u{l});
+            createcirchistplots(fullfile(resultfolder, 'individual'), groupname, ds{l}, v1{l}, v2{l}, seg{l});
         end
     end
     if(sequenceanalysis)
@@ -113,6 +108,7 @@ for k=1:length(groups)
             v1r = v1{l}(X, Y, :);
             v2r = v2{l}(X, Y, :);
             createplots(fullfile(resultfolder, 'controlregion'), groupname, ds{l}, v1r, v2r, segr, fr, ur);
+            createcirchistplots(fullfile(resultfolder, 'controlregion'), groupname, ds{l}, v1r, v2r, segr);
         end
     end
     if(thresholdedanalysis)
@@ -131,14 +127,7 @@ for k=1:length(groups)
     % Create group plots and statistics for all datasets excluding outliers.
     if(groupanalysis)
         creategroupplots(fullfile(resultfolder, 'region-all'), groupname, ds, v1, v2, seg);
-    end
-    if(groupdirstatsanalysis)
         creategroupcirchistplots(fullfile(resultfolder, 'region-all'), groupname, ds, v1, v2, seg);
-    end
-    if(dirstatsanalysis)
-        for l=1:length(ds)
-            createcirchistplots(fullfile(resultfolder, 'individual'), groupname, ds{l}, v1{l}, v2{l}, seg{l});
-        end
     end
     if(regionanalysis)
         if(any(~cellfun(@isempty, seg1)))
@@ -147,7 +136,7 @@ for k=1:length(groups)
         end
         if(any(~cellfun(@isempty, seg2)))
             creategroupplots(fullfile(resultfolder, 'region-2-anterior'), groupname, ds, v1, v2, seg2);
-            creategroupcirchistplots(fullfile(resultfolder, 'region-2-posterior'), groupname, ds, v1, v2, seg2);
+            creategroupcirchistplots(fullfile(resultfolder, 'region-2-anterior'), groupname, ds, v1, v2, seg2);
         end
     end
 end

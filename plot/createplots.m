@@ -158,7 +158,7 @@ export_fig(h, fullfile(outputFolder, sprintf('%s-polarhistogram-direction-group-
 close(h);
 
 % Group polar histogram of time-averaged angles.
-outputFolder = fullfile(resultfolder, 'polarhistogram-direction-group-time-averaged');
+outputFolder = fullfile(resultfolder, 'polarhistogram-direction-group-time-averaged', removebrackets(groupname));
 mkdir(outputFolder);
 h = figure(1);
 % Compute mean over time.
