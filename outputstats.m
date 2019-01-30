@@ -20,12 +20,9 @@ clear;
 close all;
 clc;
 
-% Set result folder.
-resultFolder = fullfile('results');
-
 % Set file.
 filename = 'runflowcomputation.log';
-file = fullfile(resultFolder, filename);
+file = fullfile(filename);
 
 % Load file.
 fprintf('Starting analysis of file: %s\n', file);

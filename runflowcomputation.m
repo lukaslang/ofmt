@@ -21,7 +21,7 @@ close all;
 clc;
 
 % Set GPU device ID (0 for none).
-gpu = 0;
+gpu = 1;
 
 % Set regularisation parameters for denoising problem.
 alpha1 = 0.005;
