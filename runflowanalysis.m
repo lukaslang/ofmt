@@ -27,16 +27,16 @@ resultfolder = fullfile('results', 'figures');
 issplit = false;
 
 % Flag to skip group analysis.
-groupanalysis = false;
+groupanalysis = true;
 
 % Flag for region analysis.
-regionanalysis = false;
+regionanalysis = true;
 
 % Flag for individual analysis.
-individualanalysis = false;
+individualanalysis = true;
 
 % Flag to output noisy and reconstructed images, and the flow.
-sequenceanalysis = false;
+sequenceanalysis = true;
 
 % Flag to output plots for thresholded images.
 thresholdedanalysis = false;
