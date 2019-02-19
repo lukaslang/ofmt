@@ -32,7 +32,7 @@ meanv2 = mean(v2, 3);
 % Colour-coding of mean velocities.
 outputFolder = fullfile(resultfolder, 'velocity-time-averaged', removebrackets(groupname));
 mkdir(outputFolder);
-col = flowToColorV2(cat(3, meanv1 .* seg, meanv2 .* seg), 10);
+col = flowcolour(cat(3, meanv1 .* seg, meanv2 .* seg), 10);
 imwrite(col, fullfile(outputFolder, sprintf('%s-velocity-time-averaged.png', dataset)));
 
 % Visualise magnitude of time-averaged velocities.

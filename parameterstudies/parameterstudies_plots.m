@@ -22,8 +22,8 @@ clc;
 
 % Set colour-coding function.
 % colourcode = @(v1, v2, len) computeColour(v1 / len, v2 / len);
-colourcode = @(v1, v2, len) flowToColorV2noBoundary(cat(3, v1, v2) / len);
-%colourcode = @(v1, v2, len) flowToColorV2(cat(3, v1, v2) / len, 10);
+colourcode = @(v1, v2, len) flowcolournoboundary(cat(3, v1, v2) / len);
+%colourcode = @(v1, v2, len) flowcolour(cat(3, v1, v2) / len, 10);
 
 % Add all subfolders.
 y = dir(datapath);

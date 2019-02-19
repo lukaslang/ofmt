@@ -28,16 +28,13 @@ function outputoverlay(resultfolder, name, v1, v2, u, seg, secx, secy)
     
     meanv1 = meanv1(11:end-10 , 11:end-10);
     meanv2 = meanv2(11:end-10 , 11:end-10);
-    col = flowToColorV2(cat(3, meanv1, meanv2), 10);
+    col = flowcolour(cat(3, meanv1, meanv2), 10);
 
     % Corrected transparency (alternatively use imfuse).
     folder = fullfile(resultfolder, name);
     mkdir(folder);
     
     % Create frame.
-    %frame = flowToColorV2(zeros(m-20, 2*n - 20, 2), 10);
-    %falph = ones(m, n);
-    %falph(11:end-10, 11:end-10) = 0;
     h = figure(1);
     alph = ~(seg(secx, secy) > 0);
     alph = cat(2, zeros(m, n), 0.5 * alph);
@@ -53,15 +50,12 @@ function outputoverlay(resultfolder, name, v1, v2, u, seg, secx, secy)
         hold on;
         a = imagesc(col);
         set(a, 'AlphaData', alph);
-        %b = imagesc(frame);
-        %set(b, 'AlphaData', 0.5 * falph);
         colormap gray;
         axis image;
         axis off;
         truesize(h, [m, 2 * n]);
         caxis([0, 1]);
         export_fig(h, fullfile(folder, sprintf('%.3i.png', l)), '-png', '-a1', '-transparent', '-native');
-        %imwrite(img, fullfile(folder2, sprintf('%.3i.png', l)));
     end
     close(h);
 end
