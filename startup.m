@@ -29,12 +29,6 @@ addpath(genpath(fullfile(libraryPath, 'circstat-matlab')));
 % CircHist is used for circular histogram plots.
 addpath(genpath(fullfile(libraryPath, 'CircHist')));
 
-% FlexBox is required for denoising and optical flow computation.
-addpath(genpath(fullfile(libraryPath, 'flexBox')));
-
-% motionEstimationGUI is used for optical flow computation.
-addpath(genpath(fullfile(libraryPath, 'motionEstimationGUI')));
-
 % Add all subfolders.
 y = dir('.');
 y = y([y.isdir]);

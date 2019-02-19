@@ -15,7 +15,8 @@
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
 %
-% This script takes a runflowcomputation.log file and outputs some stats.
+% After running runflowcomputation.sh this script takes the
+% runflowcomputation.log file and outputs some stats.
 clear;
 close all;
 clc;

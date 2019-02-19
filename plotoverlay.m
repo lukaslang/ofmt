@@ -15,7 +15,8 @@
 %    You should have received a copy of the GNU General Public License
 %    along with OFMT.  If not, see <http://www.gnu.org/licenses/>.
 %
-% This script outputs an overlay of denoised sequence and the mean flow.
+% This script outputs an overlay of denoised sequence and the mean flow as
+% in Supplementary Movie 3.
 clear;
 close all;
 clc;

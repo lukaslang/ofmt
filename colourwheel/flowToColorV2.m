@@ -106,4 +106,4 @@ v = [layerLeftRight2,[layerTop2;v;layerBottom2],layerLeftRight2];
 %
 
 % compute color
-img = computeColor(u, v);  
+img = computeColour(u, v);  

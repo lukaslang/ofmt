@@ -50,13 +50,6 @@ Moreover, this work incorporates source code from the colour wheel by
 Deqing Sun, Department of Computer Science, Brown University. The license 
 statement can be found in the respective files.
 
-Furthermore, this work includes source code of the packages:
-
-Library X.
-URL:
-
-The license statements can be found in the respective folders.
-
 3. Requirements
 
 This software was originally written for and tested with MATLAB R2017b.
@@ -80,45 +73,6 @@ GitHub: https://github.com/zifredder/CircHist
 
 >> git clone https://github.com/zifredder/CircHist
 
-flexBox: used for optical flow computation.
-GitHub: https://github.com/lukaslang/flexBox.git
-Version used: a4a24d0d680b3d2d8bc87869bde812e80750f745
-
->> git clone -recursive https://github.com/lukaslang/flexBox.git
->> cd flexBox
->> git checkout a4a24d0d680b3d2d8bc87869bde812e80750f745
-
-motionEstimationGUI: used for large motion.
-GitHub: https://github.com/HendrikMuenster/motionEstimationGUI
-Version used: 15c578a12e968a46afbe8afe571060c3ccd41e71
-
->> git clone https://github.com/HendrikMuenster/motionEstimationGUI.git
->> cd motionEstimationGUI
->> git checkout 15c578a12e968a46afbe8afe571060c3ccd41e71
-
-To run experiments with compiled flexBox follow these steps:
-
->> cd flexBox/flexBox_CPP/
->> mkdir build
->> cd build
->> cmake -DUSE_CUDA=ON -DCUDA_CUDART_LIBRARY=/usr/local/cuda/lib64/libcudart.so -DCUDA_cufft_LIBRARY=/usr/local/cuda/lib64/libcufft.so -DCUDA_cusparse_LIBRARY=/usr/local/cuda/lib64/libcusparse.so ../source/
->> make
->> make install
-
-Tested with NVIDIA Tesla K40c run on Ubuntu 16.04.4, CUDA 8, and MATLAB 2016b.
-
-On MacOS (High Sierra, 10.13.4) together with MATLAB 2017b you can run:
-
->> brew reinstall gcc --without-multilib
-# See https://stackoverflow.com/a/19016410
->> sudo ln -s /opt/X11/include/X11 /usr/local/include/X11
->> cd flexBox/flexBox_CPP/
->> mkdir build
->> cd build
->> CC=gcc-8 CXX=g++-8 cmake -D Matlab_ROOT_DIR=/Applications/MATLAB_R2017b.app/ ../source/
->> make
->> make install
-
 4. Usage
 
 For easier use we provide a startup script (startup.m), which sets up the 
@@ -138,8 +92,12 @@ in the script:
 
 - datapath.m.
 
-The following run scripts are included:
+The figures in the paper were created with the following scripts:
 
-- TODO add scripts.
+- runflowcomputation.m
+- runflowanalysis.m
 
-5. Acknowledgements
+4. Acknowledgements
+
+We gratefully acknowledge the support of NVIDIA Corporation with the
+donation of the Quadro P6000 GPU used for this research.

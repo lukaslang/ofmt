@@ -84,4 +84,4 @@ u = u / maxNormV;
 v = v / maxNormV;
 
 % compute color
-img = computeColor(u, v);  
+img = computeColour(u, v);  
