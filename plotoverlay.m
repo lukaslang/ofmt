@@ -51,24 +51,27 @@ for k=1:length(groups)
     
     [ds, v1, v2, seg, seg1, seg2, f, u] = loaddatasets(groupfolder, groupname, false);
     
+    % Select dataset.
+    l = 5;
+    
     % Output overlay.
     secx = 1:512;
     secy = 129:256;
-    outputoverlay(resultfolder, 'overlay', v1{5}, v2{5}, u{5}, seg{5}, secx, secy);
+    outputoverlay(resultfolder, 'overlay', v1{l}, v2{l}, u{l}, seg{l}, secx, secy);
     
     % Output overlay.
     secx = 55:55+127;
     secy = 129:256;
-    outputoverlay(resultfolder, 'overlay-detail-1', v1{5}, v2{5}, u{5}, seg{5}, secx, secy);
+    outputoverlay(resultfolder, 'overlay-detail-1', v1{l}, v2{l}, u{l}, seg{l}, secx, secy);
     
     % Output overlay.
     secx = 110:110+127;
     secy = 129:256;
-    outputoverlay(resultfolder, 'overlay-detail-2', v1{5}, v2{5}, u{5}, seg{5}, secx, secy);
+    outputoverlay(resultfolder, 'overlay-detail-2', v1{l}, v2{l}, u{l}, seg{l}, secx, secy);
     
     % Output overlay.
     secx = 330:330+127;
     secy = 129:256;
-    outputoverlay(resultfolder, 'overlay-detail-3', v1{5}, v2{5}, u{5}, seg{5}, secx, secy);
+    outputoverlay(resultfolder, 'overlay-detail-3', v1{l}, v2{l}, u{l}, seg{l}, secx, secy);
 
 end

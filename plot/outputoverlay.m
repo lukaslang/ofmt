@@ -42,7 +42,7 @@ function outputoverlay(resultfolder, name, v1, v2, u, seg, secx, secy)
     alph(end-9:end, :) = 1;
     alph(:, 1:10) = 1;
     alph(:, end-9:end) = 1;
-    for l=1:200
+    for l=1:size(u, 3)
         cla;
         img = u(secx, secy, l);
         img = cat(2, img, img);

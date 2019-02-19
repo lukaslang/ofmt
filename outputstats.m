@@ -23,7 +23,7 @@ clc;
 
 % Set file.
 filename = 'runflowcomputation.log';
-file = fullfile('results', filename);
+file = fullfile(filename);
 
 % Load file.
 fprintf('Starting analysis of file: %s\n', file);

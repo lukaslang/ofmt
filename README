@@ -59,17 +59,20 @@ The following libraries are required for parts of this sofware:
 export_fig: used for producing high quality figures from the results.
 GitHub: https://github.com/altmany/export_fig
 URL: http://www.mathworks.com/matlabcentral/fileexchange/23629-exportfig
+Version used: bb6c842
 
 >> git clone https://github.com/altmany/export_fig.git
 
 circstat-matlab: used to compute statistics of circular quantities.
 GitHub: https://github.com/circstat/circstat-matlab
 URL: https://uk.mathworks.com/matlabcentral/fileexchange/10676-circular-statistics-toolbox-directional-statistics
+Version used: cdbb5ca
 
 >> git clone https://github.com/circstat/circstat-matlab.git
 
 circHist: used to plot angular histograms.
 GitHub: https://github.com/zifredder/CircHist
+Version used: 535f8f4
 
 >> git clone https://github.com/zifredder/CircHist
 
@@ -90,12 +93,31 @@ Note that test/readlsmTest.m requires a certain LSM file to be available
 In order to run the software with real data set the path to your files
 in the script:
 
-- datapath.m.
+- datapath.m
+
+Make sure your data is organised in the way as in the folder 'data'.
 
 The figures in the paper were created with the following scripts:
 
 - runflowcomputation.m
+
+This script takes all the data specified in datapath.m and performs the
+two-step analysis. In order to use a GPU set the flag to the correct ID.
+On Unix it's easiest to use the script
+
+>> sh runflowcomputation.sh &
+
+to run execute the computations. Afterwards, the log file
+runflowcomputation.log can be analysed with the script outputstats.m.
+
 - runflowanalysis.m
+
+Takes the results of the computations and creates all the plots.
+
+- plotoverlay.m
+
+This script allows to overlay colour-coded velocity fields and image
+sequences.
 
 4. Acknowledgements
 
