@@ -16,15 +16,15 @@ If you use this software in your work please cite the abovementioned paper in an
 BibTeX:
 
 @article {DreLanDirBurSchoPal19,
-	author = {Drechsler, M. and Lang, L.~F. and Dirks, H. and Burger, M. and Schönlieb, C.-B. and Palacios, I.~M.},
-	title = {Optical flow analysis reveals that Kinesin-mediated advection impacts on the orientation of microtubules},
-	year = {2019},
-	% journal = {bioRxiv}
+    author = {Drechsler, M. and Lang, L.~F. and Dirks, H. and Burger, M. and Schönlieb, C.-B. and Palacios, I.~M.},
+    title = {Optical flow analysis reveals that Kinesin-mediated advection impacts on the orientation of microtubules},
+    year = {2019},
+    % journal = {bioRxiv}
     % elocation-id = {XXXXXX},
-	% doi = {10.XXXX/XXXXXX},
+    % doi = {10.XXXX/XXXXXX},
     % publisher = {Cold Spring Harbor Laboratory},
-	% url = {https://www.biorxiv.org/content/early/YYYY/MM/DD/XXXXXX},
-	% eprint = {https://www.biorxiv.org/content/early/YYYY/MM/DD/XXXXXX.full.pdf},
+    % url = {https://www.biorxiv.org/content/early/YYYY/MM/DD/XXXXXX},
+    % eprint = {https://www.biorxiv.org/content/early/YYYY/MM/DD/XXXXXX.full.pdf},
 }
 
 See Supplementary Methods for details on the models and the implementation.
