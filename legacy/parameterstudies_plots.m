@@ -22,7 +22,7 @@ clc;
 
 % Set colour-coding function.
 % colourcode = @(v1, v2, len) computeColour(v1 / len, v2 / len);
-% colourcode = @(v1, v2, len) flowToColorV2(cat(3, v1, v2) / len, 0);
+% colourcode = @(v1, v2, len) flowToColorV2noBoundary(cat(3, v1, v2) / len);
 colourcode = @(v1, v2, len) flowToColorV2(cat(3, v1, v2) / len, 10);
 
 % Add all subfolders.

@@ -1,31 +1,20 @@
 OFMT - Optical Flow for Microtubule Analysis
 
 Lukas Lang (ll542@cam.ac.uk)
-Department of Applied Mathematics and Theoretical Physics
-University of Cambridge, UK.
+Department of Applied Mathematics and Theoretical Physics, University of Cambridge, UK.
 http://www.damtp.cam.ac.uk/people/ll542/
 
 1. Introduction
 
-This is a MATLAB implementation as described in:
+This is a Matlab implementation as described in:
 
-Drechsler, M. and Lang, L. F. and Dirks, H. and Burger, M. and Schönlieb, C.-B. and Palacios, I. M. Optical flow analysis reveals that Kinesin-mediated advection impacts on the orientation of microtubules, 2019.
+TODO: Add paper reference.
 
-If you use this software in your work please cite the abovementioned paper in any resulting publication.
+If you use this software in your work you must cite the abovementioned paper in any resulting publication!
 
 BibTeX:
 
-@article {DreLanDirBurSchoPal19,
-	author = {Drechsler, M. and Lang, L.~F. and Dirks, H. and Burger, M. and Schönlieb, C.-B. and Palacios, I. M},
-	title = {Optical flow analysis reveals that Kinesin-mediated advection impacts on the orientation of microtubules},
-	year = {2019},
-    % elocation-id = {XXXXXX},
-	% doi = {10.XXXX/XXXXXX},
-	% publisher = {Cold Spring Harbor Laboratory},
-	% url = {https://www.biorxiv.org/content/early/YYYY/MM/DD/XXXXXX},
-	% eprint = {https://www.biorxiv.org/content/early/YYYY/MM/DD/XXXXXX.full.pdf},
-	% journal = {bioRxiv}
-}
+TODO: Add BibTeX.
 
 2. License & Disclaimer
 
@@ -59,7 +48,7 @@ The license statements can be found in the respective folders.
 
 3. Requirements
 
-This software was originally written for and tested with MATLAB R2017b.
+This software was originally written for and tested with Matlab R2016b.
 
 The following libraries are required for parts of this sofware:
 
@@ -105,9 +94,9 @@ To run experiments with compiled flexBox follow these steps:
 >> make
 >> make install
 
-Tested with NVIDIA Tesla K40c run on Ubuntu 16.04.4, CUDA 8, and MATLAB 2016b.
+Tested with NVIDIA Tesla K40c run on Ubuntu 16.04.4, CUDA 8, and Matlab 2016b.
 
-On MacOS (High Sierra, 10.13.4) together with MATLAB 2017b you can run:
+On MacOS (High Sierra, 10.13.4) together with Matlab 2017b you can run:
 
 >> brew reinstall gcc --without-multilib
 # See https://stackoverflow.com/a/19016410
@@ -122,7 +111,7 @@ On MacOS (High Sierra, 10.13.4) together with MATLAB 2017b you can run:
 4. Usage
 
 For easier use we provide a startup script (startup.m), which sets up the 
-MATLAB search path. It includes required libraries and adds required 
+Matlab search path. It includes required libraries and adds required 
 subdirectories. Make sure to download the required packages and to set the 
 library paths properly. Then simply run the startup script.
 
