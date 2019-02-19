@@ -43,7 +43,7 @@ end
 outputFolder = fullfile(resultfolder, removebrackets(groupname), removebrackets(dataset), 'flow-scaled-no-boundary');
 mkdir(outputFolder);
 for k=1:size(v1, 3)
-    col = flowToColorV2noBoundary(cat(3, v1(:, :, k), v2(:, :, k)));
+    col = flowToColorV2(cat(3, v1(:, :, k), v2(:, :, k)), 0);
     imwrite(col, fullfile(outputFolder, sprintf('%s-flow-%.3i.png', dataset, k)));
 end
 
