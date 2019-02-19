@@ -16,16 +16,18 @@ If you use this software in your work please cite the abovementioned paper in an
 BibTeX:
 
 @article {DreLanDirBurSchoPal19,
-	author = {Drechsler, M. and Lang, L.~F. and Dirks, H. and Burger, M. and Schönlieb, C.-B. and Palacios, I. M},
+	author = {Drechsler, M. and Lang, L.~F. and Dirks, H. and Burger, M. and Schönlieb, C.-B. and Palacios, I.~M.},
 	title = {Optical flow analysis reveals that Kinesin-mediated advection impacts on the orientation of microtubules},
 	year = {2019},
+	% journal = {bioRxiv}
     % elocation-id = {XXXXXX},
 	% doi = {10.XXXX/XXXXXX},
-	% publisher = {Cold Spring Harbor Laboratory},
+    % publisher = {Cold Spring Harbor Laboratory},
 	% url = {https://www.biorxiv.org/content/early/YYYY/MM/DD/XXXXXX},
 	% eprint = {https://www.biorxiv.org/content/early/YYYY/MM/DD/XXXXXX.full.pdf},
-	% journal = {bioRxiv}
 }
+
+See Supplementary Methods for details on the models and the implementation.
 
 2. License & Disclaimer
 
@@ -49,6 +51,8 @@ For the full license statement see the file COPYING.
 Moreover, this work incorporates source code from the colour wheel by 
 Deqing Sun, Department of Computer Science, Brown University. The license 
 statement can be found in the respective files.
+
+In addition, two files were adapted from code shared by Hendrik Dirks.
 
 3. Requirements
 
@@ -87,15 +91,13 @@ To run the test cases execute
 
 >> runtests('test')
 
-Note that test/readlsmTest.m requires a certain LSM file to be available 
-(set via datapath.m)!
-
 In order to run the software with real data set the path to your files
 in the script:
 
 - datapath.m
 
-Make sure your data is organised in the way as in the folder 'data'.
+Make sure your data is organised in the way as in the folder 'data'. This
+folder contains a minimal dataset required to run the code.
 
 The figures in the paper were created with the following scripts:
 
@@ -112,7 +114,10 @@ runflowcomputation.log can be analysed with the script outputstats.m.
 
 - runflowanalysis.m
 
-Takes the results of the computations and creates all the plots.
+Takes the results of the computations and creates all the plots. Note that
+the folder 'data' contains only one sample dataset. In order to run this
+script and create the aggregated plots, multiple image sequences are
+required.
 
 - plotoverlay.m
 
