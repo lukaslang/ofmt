@@ -55,4 +55,20 @@ delete(ch.polarAxs.Title);
 export_fig(h, fullfile(outputfolder, sprintf('%s-circular-histogram-all.png', ds)), '-png', resolution, '-a1', '-transparent');
 close(h);
 
+% Polar histogram of all angles.
+outputfolder = fullfile(resultfolder, 'circular-histogram-all-fixed-axis', groupname);
+mkdir(outputfolder);
+
+% Plot angular histogram.
+h = figure;
+ch = CircHist(mod(rad2deg(theta), 360), 50);
+ch.polarAxs.ThetaZeroLocation = 'right';
+ch.fontSize = 20;
+ch.polarAxs.LineWidth = 1.5;
+ch.setRLim([llim, ulim]);
+delete(ch.scaleBar);
+delete(ch.polarAxs.Title);
+export_fig(h, fullfile(outputfolder, sprintf('%s-circular-histogram-all-fixed-axis.png', ds)), '-png', resolution, '-a1', '-transparent');
+close(h);
+
 end

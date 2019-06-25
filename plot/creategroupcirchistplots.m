@@ -62,6 +62,21 @@ delete(ch.polarAxs.Title);
 export_fig(h, fullfile(outputfolder, sprintf('%s-circular-histogram-all.png', groupname)), '-png', resolution, '-a1', '-transparent');
 close(h);
 
+% Combined polar histogram of all angles.
+outputfolder = fullfile(resultfolder, 'circular-histogram-all-fixed-axis');
+mkdir(outputfolder);
+
+h = figure;
+ch = CircHist(theta, 50);
+ch.polarAxs.ThetaZeroLocation = 'right';
+ch.fontSize = 20;
+ch.polarAxs.LineWidth = 1.5;
+ch.setRLim([llim, ulim]);
+delete(ch.scaleBar);
+delete(ch.polarAxs.Title);
+export_fig(h, fullfile(outputfolder, sprintf('%s-circular-histogram-all-fixed-axis.png', groupname)), '-png', resolution, '-a1', '-transparent');
+close(h);
+
 % Create table with magnitudes.
 outputFolder = fullfile(resultfolder, 'circular-histogram-all-table');
 mkdir(outputFolder);
